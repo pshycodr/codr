@@ -11,7 +11,7 @@ def main():
     parser.add_argument('--query', required=True, help='Query to ask')
     args = parser.parse_args()
 
-    results = run_rag_pipeline(args.url, args.query)
+    results = run_rag_pipeline(args.url, args.query, req_type='doc')
     for i, res in enumerate(results, 1):
         print(f"[{i}] {res}...\n")
 

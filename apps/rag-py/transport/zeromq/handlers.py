@@ -1,14 +1,15 @@
 from services.rag_pipeline import run_rag_pipeline
 
 def handle_rag_request(request: dict) -> dict:
-    url = request.get("url")
+    path = request.get("url")
     query = request.get("query")
+    req_type = request.get('type')
 
-    if not url or not query:
-        return { "error": "Missing 'url' or 'query'" }
+    if not path or not query:
+        return { "error": "Missing 'path or url' or 'query'" }
 
     try:
-        results = run_rag_pipeline(url, query)
+        results = run_rag_pipeline(path, query, req_type)
         return { "results": results }
     except Exception as e:
         return { "error": str(e) }

@@ -4,6 +4,7 @@ import callRAG from "../../../transport/zeromqClient";
 interface QueryData {
     url: string;
     query: string;
+    type? : 'doc' | 'webpage' 
 }
 
 export async function queryWebsite(data: QueryData): Promise<{ success: boolean; decision?: string }> {

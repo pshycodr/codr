@@ -4,6 +4,7 @@ import zmq from 'zeromq';
 interface CallRAG {
     url: string;
     query: string;
+    type? : 'doc' | 'webpage' 
 }
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));

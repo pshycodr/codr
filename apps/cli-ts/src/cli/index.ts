@@ -18,12 +18,21 @@ program
   });
 
 program
-  .command("rag")
+  .command("webpage")
   .description("Query a web page using RAG")
   .requiredOption("-u, --url <url>")
   .requiredOption("-q, --query <query>")
   .action(async (opts) => {
-    await queryWebsite({ url: opts.url, query: opts.query });
+    await queryWebsite({ url: opts.url, query: opts.query, type: 'webpage' });
+  });
+
+program
+  .command("doc")
+  .description("Query a documents(.pdf, .docx, .txt, .csv, .md ) using RAG")
+  .requiredOption("-p, --path <path>")
+  .requiredOption("-q, --query <query>")
+  .action(async (opts) => {
+    await queryWebsite({ url: opts.path, query: opts.query, type: 'doc' });
   });
 
 // program

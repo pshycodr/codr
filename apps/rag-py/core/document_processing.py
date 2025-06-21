@@ -1,35 +1,19 @@
-from langchain_community.document_loaders import WebBaseLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from typing import List
 from langchain_core.documents import Document
 from config.settings import settings
 import os
 import logging
-from urllib.parse import urlparse
-from utils.sanitize_text import sanitize_text
+from core.loaders import load_doc_file
 
 logger = logging.getLogger(__name__)
 
-def load_and_split_documents(url: str) -> List[Document]:
+def load_and_split_documents(path: str, req_type: str) -> List[Document]:
     """Load and split documents from URL"""
     try:
-        logger.info(f"Loading documents from: {url}")
+        logger.info(f"Loading documents from: {path}")
         
-        # Configure loader
-        parsed_url = urlparse(url)
-        loader = WebBaseLoader(
-            url,
-            requests_kwargs={
-                'headers': {'User-Agent': os.environ['USER_AGENT']},
-                'timeout': settings.TIMEOUT
-            }
-        )
-        
-        # Load and split documents
-        docs = loader.load()
-
-        for doc in docs:
-            doc.page_content = sanitize_text(doc.page_content)
+        docs = load_doc_file(path, req_type)
         
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=settings.CHUNK_SIZE,

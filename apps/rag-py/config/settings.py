@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     CHUNK_SIZE: int = 512
     CHUNK_OVERLAP: int = 128
-    TOP_K: int = 10
+    TOP_K: int = 5
     PERSIST_DIR: str = "./chroma_db"
     MAX_RETRIES: int = 3
     TIMEOUT: int = 10
