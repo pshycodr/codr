@@ -6,6 +6,7 @@ from config.settings import settings
 import os
 import logging
 from urllib.parse import urlparse
+from utils.sanitize_text import sanitize_text
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,9 @@ def load_and_split_documents(url: str) -> List[Document]:
         
         # Load and split documents
         docs = loader.load()
+
+        for doc in docs:
+            doc.page_content = sanitize_text(doc.page_content)
         
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=settings.CHUNK_SIZE,

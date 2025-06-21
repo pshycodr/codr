@@ -30,6 +30,7 @@ while running:
     if socket in socks and socks[socket] == zmq.POLLIN:
         request = socket.recv_json()
         response = handle_rag_request(request)
+        # print(response)
         socket.send_json(response)
 
 socket.close()

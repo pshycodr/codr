@@ -1,4 +1,4 @@
-# ai-code-writer
+# CODR
 
 To install dependencies:
 
