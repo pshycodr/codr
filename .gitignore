@@ -41,4 +41,5 @@ chroma_db
 db
 PRD*
 *.lock
-__pycache__
+__pycache__/
+*.py[cod]
