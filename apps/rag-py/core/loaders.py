@@ -6,6 +6,8 @@ from langchain_community.document_loaders import (
 )
 from urllib.parse import urlparse
 from utils.sanitize_text import sanitize_text
+import os
+from config.settings import settings
 
 def load_doc_file(file_path: str, req_type: str) -> list[Document]:
     print(f"File Path: {file_path}")
@@ -13,16 +15,16 @@ def load_doc_file(file_path: str, req_type: str) -> list[Document]:
     suffix = path.suffix.lower()
     try:
         if req_type == 'webpage' : 
-            parsed_url = urlparse(url)
+            parsed_url = urlparse(file_path)
             loader = WebBaseLoader(
-                url,
+                file_path,
                 requests_kwargs={
                     'headers': {'User-Agent': os.environ['USER_AGENT']},
                     'timeout': settings.TIMEOUT
                 }
             )
 
-        if suffix == ".pdf":
+        elif suffix == ".pdf":
             loader = PyPDFLoader(str(path))
         elif suffix == ".txt":
             loader = TextLoader(str(path), encoding="utf-8")

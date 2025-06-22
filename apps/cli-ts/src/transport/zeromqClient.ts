@@ -1,48 +1,83 @@
 import chalk from 'chalk';
+
+import { randomUUID } from 'crypto';
+
 import zmq from 'zeromq';
+import formatContext from '../utils/formatContext';
+import { getCompletionFromOpenRouter } from '../core/agents/ragAnswerAI';
 
 interface CallRAG {
-    url: string;
-    query: string;
-    type? : 'doc' | 'webpage' 
+    path?: string;
+    query?: string;
+    type?: 'doc' | 'webpage';
+    session_id?: string;
 }
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const callRAG = async (data: CallRAG) => {
-    console.log(chalk.yellowBright("🔁 callRAG Called"));
 
     const socket = new zmq.Request();
 
     try {
-        console.log(chalk.yellowBright("🔌 Connecting to ZeroMQ..."));
         await socket.connect("tcp://127.0.0.1:5555");
 
-        await delay(100); // 👈 Important: let connection stabilize
+        await delay(100);
 
-        console.log(chalk.yellowBright("📤 Sending request..."));
+        const start = Date.now();
         await socket.send(JSON.stringify(data));
 
-        console.log(chalk.yellowBright("⏳ Waiting for response..."));
         const [result] = await socket.receive();
 
+
         if (!result) {
-            throw new Error("No response received from ZeroMQ server.");
+            throw new Error("No r`esponse received from ZeroMQ server.");
         }
 
         const response = JSON.parse(result.toString());
-        // console.log(chalk.greenBright("✅ Response received:"), response);
 
         return { success: true, response };
     } catch (error) {
-        console.error(chalk.redBright("❌ Error in callRAG:"), error);
         return { success: false, error };
     } finally {
-        // Close the socket with a slight delay after receive
         await delay(50);
         await socket.close();
-        console.log(chalk.gray("🔒 ZeroMQ socket closed."));
     }
 };
 
 export default callRAG;
+
+export const startChatSession = async ({ path, query, type }: CallRAG) => {
+
+    const session_id = randomUUID();
+
+    const payLoad = {
+        chat_type: "init_chat",
+        path,
+        query,
+        type,
+        session_id
+    };
+
+    const response = await callRAG(payLoad);
+
+    return { session_id, response };
+};
+
+export async function sendChatMessageToRag({ message, session_id }: { message: string, session_id: string }) {
+
+    const payload = {
+        chat_type: "chat_message",
+        message,
+        session_id
+    };
+
+    const { success: ragSuccess, response: context } = await callRAG(payload);
+    
+    const formattedContext = formatContext(context.results);
+
+    const {decision} = await getCompletionFromOpenRouter({query: message, context: formattedContext})
+
+
+    return decision;
+}

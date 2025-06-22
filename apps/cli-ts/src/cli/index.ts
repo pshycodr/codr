@@ -3,6 +3,9 @@ import { program } from "commander";
 import { queryWebsite } from "../core/tools/documents/queryWebsite";
 // import { readFile } from "../core/tools/file/readFile";
 import { runLangGraphAgent } from "../core/agents/langgraphAgent";
+import { startChatUI } from "./ui/chatUI";
+import { chatWithContext } from "./commands/chat";
+import chalk from "chalk";
 
 program
   .name("codr")
@@ -22,8 +25,15 @@ program
   .description("Query a web page using RAG")
   .requiredOption("-u, --url <url>")
   .requiredOption("-q, --query <query>")
+  .option("--chat", "Open persistent chat UI")
   .action(async (opts) => {
-    await queryWebsite({ url: opts.url, query: opts.query, type: 'webpage' });
+    if (opts.chat) {
+      console.log(chalk.bgYellow.black("from webpage --chat"))
+
+      await chatWithContext({ path: opts.url, query: opts.query, type: 'webpage' })
+    }else{
+    await queryWebsite({ path: opts.url, query: opts.query, type: 'webpage' });
+    }
   });
 
 program
@@ -31,8 +41,15 @@ program
   .description("Query a documents(.pdf, .docx, .txt, .csv, .md ) using RAG")
   .requiredOption("-p, --path <path>")
   .requiredOption("-q, --query <query>")
+  .option("--chat", "Open persistent chat UI")
   .action(async (opts) => {
-    await queryWebsite({ url: opts.path, query: opts.query, type: 'doc' });
+    if (opts.chat) {
+      console.log(chalk.bgYellow.black("from doc --chat"))
+
+      await chatWithContext({ path: opts.path, query: opts.query, type: 'doc' })
+    } else {
+      await queryWebsite({ path: opts.path, query: opts.query, type: 'doc' });
+    }
   });
 
 // program

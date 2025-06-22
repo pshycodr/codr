@@ -1,54 +1,126 @@
-// import chalk from "chalk";
-// import ora from "ora";
-// import readline from "readline";
-// import { runLangGraphAgent } from "../../core/agents/langgraphAgent"; 
+import blessed from 'blessed';
+import { sendChatMessageToRag } from '../../transport/zeromqClient';
 
-// export function startChatInterface() {
-//   console.log(chalk.bold.green("\n💡 Welcome to Codr Chat Mode!\n"));
+export async function startChatUI(session_id: string, firstMessage: string) {
+  const screen = blessed.screen({
+    smartCSR: true,
+    title: 'Codr Terminal Chat',
+    fullUnicode: true,
+    mouse: true,
+    keys: true,
+  });
 
-//   const rl = readline.createInterface({
-//     input: process.stdin,
-//     output: process.stdout,
-//     prompt: chalk.blueBright("You » "),
-//   });
+  const chatBox = blessed.box({
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '85%',
+    label: ' Chat ',
+    border: { type: 'line' },
+    style: {
+      border: { fg: 'cyan' },
+      label: { fg: 'white', bold: true },
+    },
+    scrollable: true,
+    alwaysScroll: true,
+    mouse: true,
+    keys: true,
+    vi: true,
+    scrollbar: {
+      ch: ' ',
+      style: { bg: 'blue' },
+    },
+    tags: true,
+  });
 
-//   rl.prompt();
+  const input = blessed.textbox({
+    bottom: 0,
+    height: '15%',
+    width: '100%',
+    label: ' You ',
+    border: { type: 'line' },
+    style: {
+      fg: 'white',
+      bg: 'black',
+      border: { fg: 'green' },
+      label: { fg: 'white', bold: true },
+    },
+    inputOnFocus: true,
+    padding: { left: 1 },
+  });
 
-//   rl.on("line", async (input: string) => {
-//     const spinner = ora("Thinking...").start();
+  screen.append(chatBox);
+  screen.append(input);
+  input.focus();
 
-//     try {
-//       const response = await runLangGraphAgent(input);
-//       spinner.stop();
-//       if (response) printBotMessage(response);
-//     } catch (err: any) {
-//       spinner.fail("Something went wrong.");
-//       console.error(chalk.redBright("❌ Error:"), err.message);
-//     }
+  const messages: string[] = [];
+  const append = (msg: string) => {
+    messages.push(msg);
+    chatBox.setContent(messages.join('\n\n'));
+    chatBox.setScrollPerc(100);
+    screen.render();
+  };
 
-//     rl.prompt();
-//   });
+  append(`{bold}{cyan-fg}Assistant:{/cyan-fg}{/bold} ${firstMessage}`);
 
-//   rl.on("SIGINT", () => {
-//     console.log(chalk.cyanBright("\n👋 Exiting chat. Bye!\n"));
-//     rl.close();
-//     process.exit(0);
-//   });
-// }
+  input.on('submit', async (message) => {
+    if (message.trim()) {
+      append(`{bold}{green-fg}You:{/green-fg}{/bold} ${message}`);
+      input.clearValue();
+      input.focus();
+      screen.render();
 
-// function printBotMessage(message: string) {
-//   const lines = message.split("\n");
-//   for (const line of lines) {
-//     process.stdout.write(chalk.greenBright("Codr » "));
-//     let i = 0;
-//     const interval = setInterval(() => {
-//       if (i < line.length) {
-//         process.stdout.write(line[i]);
-//         i++;
-//       } else {
-//         process.stdout.write("\n");
-//         clearInterval(interval);
-//       }
-//     }, 10);
-//   }
-// }
+      let loadingDots = '';
+      const loadingMsg = `{bold}{cyan-fg}Assistant:{/cyan-fg}{/bold} Thinking`;
+      let loadingIndex = messages.length;
+      messages.push(loadingMsg);
+      chatBox.setContent(messages.join('\n\n'));
+      chatBox.setScrollPerc(100);
+      screen.render();
+
+      const interval = setInterval(() => {
+        loadingDots += '.';
+        if (loadingDots.length > 3) loadingDots = '';
+        messages[loadingIndex] = `{bold}{cyan-fg}Assistant:{/cyan-fg}{/bold} Thinking${loadingDots}`;
+        chatBox.setContent(messages.join('\n\n'));
+        chatBox.setScrollPerc(100);
+        screen.render();
+      }, 300);
+
+      const result = await sendChatMessageToRag({ message, session_id });
+      clearInterval(interval);
+
+      messages[loadingIndex] = `{bold}{cyan-fg}Assistant:{/cyan-fg}{/bold} ${result}`;
+      chatBox.setContent(messages.join('\n\n'));
+      chatBox.setScrollPerc(100);
+      screen.render();
+    }
+  });
+
+  screen.key(['up'], () => {
+    chatBox.scroll(-1);
+    screen.render();
+  });
+
+  screen.key(['down'], () => {
+    chatBox.scroll(1);
+    screen.render();
+  });
+
+  screen.key(['pageup'], () => {
+    chatBox.scroll(-10);
+    screen.render();
+  });
+
+  screen.key(['pagedown'], () => {
+    chatBox.scroll(10);
+    screen.render();
+  });
+
+  screen.key(['C-c', 'escape', 'q'], () => {
+    screen.destroy();
+    process.exit(0);
+  });
+
+  screen.render();
+}

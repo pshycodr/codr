@@ -1,10 +1,11 @@
 import chalk from "chalk";
 import callRAG from "../../../transport/zeromqClient";
+import formatContext from "../../../utils/formatContext";
 
 interface QueryData {
-    url: string;
+    path: string;
     query: string;
-    type? : 'doc' | 'webpage' 
+    type?: 'doc' | 'webpage'
 }
 
 export async function queryWebsite(data: QueryData): Promise<{ success: boolean; decision?: string }> {
@@ -88,9 +89,3 @@ export async function queryWebsite(data: QueryData): Promise<{ success: boolean;
     }
 }
 
-
-function formatContext(chunks: string[]): string {
-    return chunks
-        .map((chunk, i) => `(${i + 1}) ${chunk.trim()}`)
-        .join("\n\n");
-}

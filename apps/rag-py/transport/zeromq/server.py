@@ -29,6 +29,7 @@ while running:
     socks = dict(poller.poll(timeout=100))
     if socket in socks and socks[socket] == zmq.POLLIN:
         request = socket.recv_json()
+        print(request)
         response = handle_rag_request(request)
         # print(response)
         socket.send_json(response)
