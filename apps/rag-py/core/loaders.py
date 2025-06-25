@@ -1,7 +1,7 @@
 from pathlib import Path
 from langchain_core.documents import Document
 from langchain_community.document_loaders import (
-    PyPDFLoader, TextLoader, CSVLoader,
+    PyMuPDFLoader, TextLoader, CSVLoader,
     UnstructuredWordDocumentLoader, UnstructuredMarkdownLoader, WebBaseLoader
 )
 from urllib.parse import urlparse
@@ -25,7 +25,7 @@ def load_doc_file(file_path: str, req_type: str) -> list[Document]:
             )
 
         elif suffix == ".pdf":
-            loader = PyPDFLoader(str(path))
+           loader = PyMuPDFLoader(str(path))
         elif suffix == ".txt":
             loader = TextLoader(str(path), encoding="utf-8")
         elif suffix == ".csv":

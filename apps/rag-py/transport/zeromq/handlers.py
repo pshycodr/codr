@@ -8,16 +8,15 @@ def handle_rag_request(request: dict) -> dict:
         session_id = request.get("session_id")
         path = request.get("path")
         query = request.get("query")
-        doc_type = request.get("doc_type") or "doc"
+        type = request.get("type") or "doc"
 
         if not session_id or not path or not query:
             return {"error": "Missing 'session_id', 'path', or 'query'"}
 
         try:
-            retriever = init_session(session_id, path, doc_type)
-            session_store[session_id] = retriever  # ✅ FIXED
-            results = retriever.invoke(query)
-            return { "results": [doc.page_content for doc in results] }
+            retriever = init_session(session_id, path, type)
+            session_store[session_id] = retriever 
+            return { "msg": "Chat Session Created"}
         except Exception as e:
             return { "error": str(e) }
 
@@ -41,13 +40,13 @@ def handle_rag_request(request: dict) -> dict:
     else:
         path = request.get("path")
         query = request.get("query")
-        doc_type = request.get("doc_type") or "doc"
+        type = request.get("type") or "doc"
 
         if not path or not query:
             return { "error": "Missing 'path' or 'query'" }
 
         try:
-            results = run_rag_pipeline(path, query, doc_type)
+            results = run_rag_pipeline(path, query, type)
             return { "results": results }
         except Exception as e:
             return { "error": str(e) }
