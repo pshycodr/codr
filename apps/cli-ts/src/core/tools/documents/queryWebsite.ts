@@ -13,9 +13,9 @@ export async function queryWebsite(data: QueryData): Promise<{ success: boolean;
         console.log(chalk.yellowBright("QueryWebsite Called\n"));
         const { success: ragSuccess, response: context } = await callRAG(data);
 
-        console.log(chalk.yellowBright("Context: "), typeof context);
+        console.log(chalk.yellowBright("Context: "),  context);
         const formattedContext = formatContext(context.results);
-        console.log(chalk.yellowBright("formattedContext: "), typeof formattedContext);
+        console.log(chalk.yellowBright("formattedContext: "),  formattedContext);
 
         if (!ragSuccess) {
             console.log(chalk.redBright("❌ Failed to retrieve context from RAG."));

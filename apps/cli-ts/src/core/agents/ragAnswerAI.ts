@@ -3,12 +3,14 @@ import chalk from "chalk";
 interface CompletionInput {
     query: string;
     context: string;
-    model?: string; 
+    model?: string;
+    summary? : string
 }
 
 export async function getCompletionFromOpenRouter({
     query,
     context,
+    summary,
     model = "mistralai/mistral-7b-instruct", // Default model
 }: CompletionInput): Promise<{ success: boolean; decision?: string }> {
     try {
@@ -25,25 +27,35 @@ export async function getCompletionFromOpenRouter({
                     {
                         role: "system",
                         content: `
-You are a helpful assistant. Use the following context to answer the user's question clearly and accurately.
+                        You are a precise, context-aware assistant. Your job is to generate accurate, complete, and clear answers using the information provided in the current context and the ongoing conversation's summary.
 
-- Only answer using the information explicitly provided in the context.
-- Do not add, infer, or assume anything that is not clearly stated in the context.
-- If the context does not contain the answer, respond with: "I don't know based on the provided context."
-- Keep the answer brief but informative — ideally 2 to 4 sentences.
-- Use plain language. Do not use markdown, bullet points, or lists.
+                        Guidelines:
+                        - Base your answer on the combination of:
+                            1. The **current retrieved context** (from documents or web),
+                            2. The **previous chat summary** (which gives conversation continuity).
+                        - Use **only** information explicitly present in the context or summary. Do not assume or invent anything not included.
+                        - If neither the summary nor the context contain the answer, respond with: "I don't know based on the provided context."
+                        - Provide full, detailed answers. Include names, actions, motivations, technical points, or facts if they are present.
+                        - Avoid vague statements or generalizations. Be concrete, specific, and technically accurate.
+                        - Use natural, plain English and write in **clear, complete sentences**.
+                        - Do **not** summarize the context or the summary—only use them to accurately answer the user's question.
 
----
-Question:
-${query}
+                        ---
+                        Previous Chat Summary:
+                        ${summary || "No previous summary."}
 
----
-Context:
-${context}
+                        ---
+                        Question:
+                        ${query}
 
----
-Answer:
-`.trim(),
+                        ---
+                        Context:
+                        ${context}
+
+                        ---
+                        Answer:
+                        `
+                        .trim(),
                     },
                 ],
             }),

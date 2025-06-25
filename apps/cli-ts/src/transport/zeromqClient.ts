@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 import zmq from 'zeromq';
 import formatContext from '../utils/formatContext';
 import { getCompletionFromOpenRouter } from '../core/agents/ragAnswerAI';
+import { getSummarizeChat } from '../core/agents/chatSummarizer';
 
 interface CallRAG {
     path?: string;
@@ -31,7 +32,7 @@ const callRAG = async (data: CallRAG) => {
 
 
         if (!result) {
-            throw new Error("No r`esponse received from ZeroMQ server.");
+            throw new Error("No response received from ZeroMQ server.");
         }
 
         const response = JSON.parse(result.toString());
@@ -47,11 +48,12 @@ const callRAG = async (data: CallRAG) => {
 
 export default callRAG;
 
+
 export const startChatSession = async ({ path, query, type }: CallRAG) => {
 
     const session_id = randomUUID();
 
-    const payLoad = {
+    const payload = {
         chat_type: "init_chat",
         path,
         query,
@@ -59,13 +61,18 @@ export const startChatSession = async ({ path, query, type }: CallRAG) => {
         session_id
     };
 
-    const response = await callRAG(payLoad);
+    const {success, response} = await callRAG(payload);
+    
+    console.log(chalk.greenBright(response.msg));
+    
 
-    return { session_id, response };
+    return { session_id,  query };
 };
 
-export async function sendChatMessageToRag({ message, session_id }: { message: string, session_id: string }) {
 
+let previousSummary = "";
+
+export async function sendChatMessageToRag({ message, session_id }: { message: string, session_id: string }) {
     const payload = {
         chat_type: "chat_message",
         message,
@@ -73,11 +80,26 @@ export async function sendChatMessageToRag({ message, session_id }: { message: s
     };
 
     const { success: ragSuccess, response: context } = await callRAG(payload);
-    
     const formattedContext = formatContext(context.results);
 
-    const {decision} = await getCompletionFromOpenRouter({query: message, context: formattedContext})
+    const { decision } = await getCompletionFromOpenRouter({ query: message, context: formattedContext, summary: previousSummary });
 
+    const currentChat = {
+        user_query: message,
+        assistant_answer: decision
+    };
+
+    void (async () => {
+        const { success, decision: newSummary } = await getSummarizeChat({
+            chat: currentChat,
+            prevSummary: previousSummary
+        });
+
+        if (success && newSummary) {
+            previousSummary = newSummary;
+            console.log("📝 Chat Summary Updated.");
+        }
+    })();
 
     return decision;
 }

@@ -1,21 +1,27 @@
 import chalk from "chalk";
-import { startChatSession } from "../../transport/zeromqClient"
+import { sendChatMessageToRag, startChatSession } from "../../transport/zeromqClient"
 import { startChatUI } from "../ui/chatUI";
 
 interface CallRAG {
     path?: string;
-    query?: string;
+    query: string;
     type?: 'doc' | 'webpage';
 }
 
-export const chatWithContext = async (data :CallRAG ) => {
+export const chatWithContext = async (data: CallRAG) => {
 
-    const {session_id, response} = await startChatSession(data)
+    const { session_id, query } = await startChatSession(data)
 
-    console.log(chalk.bgCyanBright.black("Initial Response: "), response);
-    
+    // console.log(chalk.bgCyanBright.black("Initial Response: "), response);
 
-    const firstReply = response?.response?.decision || "No initial response";
-    await startChatUI(session_id, firstReply);
+    if (!query) throw new Error("Query is required to start chat");
+
+    const decision = await sendChatMessageToRag({ message: query, session_id });
+
+    if (!decision) throw new Error("No Decision Available");
+
+    const firstReply = "No initial response";
+
+    await startChatUI(session_id, query, decision);
 
 }

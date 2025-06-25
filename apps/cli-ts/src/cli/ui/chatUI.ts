@@ -1,7 +1,7 @@
 import blessed from 'blessed';
 import { sendChatMessageToRag } from '../../transport/zeromqClient';
 
-export async function startChatUI(session_id: string, firstMessage: string) {
+export async function startChatUI(session_id: string, query: string, firstMessage: string) {
   const screen = blessed.screen({
     smartCSR: true,
     title: 'Codr Terminal Chat',
@@ -61,6 +61,7 @@ export async function startChatUI(session_id: string, firstMessage: string) {
     screen.render();
   };
 
+  append(`{bold}{green-fg}You:{/green-fg}{/bold} ${query}`);
   append(`{bold}{cyan-fg}Assistant:{/cyan-fg}{/bold} ${firstMessage}`);
 
   input.on('submit', async (message) => {
