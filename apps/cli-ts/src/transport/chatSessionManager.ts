@@ -10,10 +10,12 @@ export class ChatSessionManager {
     private ragClient: RagClient;
     private sessionId: string;
     private previousSummary = "";
+    type: string | undefined;
 
     constructor(ragClient: RagClient) {
         this.ragClient = ragClient;
         this.sessionId = randomUUID();
+
     }
 
     async startSession({ path, query, type }: { path: string, query: string, type: string }) {
@@ -24,7 +26,7 @@ export class ChatSessionManager {
             type,
             session_id: this.sessionId
         };
-
+        this.type = type
         const { success, response } = await this.ragClient.callRagOnce(payload);
         console.log(chalk.greenBright(response.msg));
         return { session_id: this.sessionId, query };
@@ -35,7 +37,7 @@ export class ChatSessionManager {
             chat_type: "chat_message",
             message,
             session_id: this.sessionId,
-            type: 'codebase'
+            type: this.type
         };
 
         const { success, response, error } = await this.ragClient.callRagOnce(payload);
