@@ -1,12 +1,12 @@
 import { tool } from "@langchain/core/tools"
 import { z } from "zod"
 import { llm } from "../llm/gemini"
-import createFolder from "./createFolders"
+import createFolder from "./files/createFolders"
 import runCommand from "./runCommand"
-import createFiles from "./createFiles"
-import readFile from "./readFile"
-import writeFile from "./writeFile"
-import findFile from "./findFile"
+import createFiles from "./files/createFiles"
+import readFile from "./files/readFile"
+import writeFile from "./files/writeFile"
+import findFile from "./files/findFile"
 import { makeToolCallingDecision } from "./makeToolCallingDecision"
 
 const makeFolder = tool(
