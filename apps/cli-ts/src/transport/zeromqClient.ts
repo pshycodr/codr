@@ -49,64 +49,37 @@ const callRAG = async (data: CallRAG) => {
 export default callRAG;
 
 export class RagClient {
-    private socket: zmq.Request;
     private endpoint: string;
-    private previousSummary = '';
 
     constructor(endpoint = 'tcp://127.0.0.1:5500') {
-        this.socket = new zmq.Request()
-        this.endpoint = endpoint
+        this.endpoint = endpoint;
     }
 
     private async delay(ms: number) {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-    async send(payload: any) {
+    async callRagOnce(payload: any) {
+        const socket = new zmq.Request();
+
         try {
-            await this.socket.connect(this.endpoint);
-            await this.delay(100)
+            await socket.connect(this.endpoint);
+            await this.delay(100); // Small delay to ensure socket is ready
 
-            await this.socket.send(JSON.stringify(payload))
-            return { success: true };
-        } catch (error) {
-            return { success: false, error };
-        }
-    }
+            await socket.send(JSON.stringify(payload));
 
-    async revieve() {
-        try {
-            const [result] = await this.socket.receive();
-            if (!result) throw new Error("No response received from ZeroMQ server.");
-
+            const [result] = await socket.receive();
+            if (!result) {
+                throw new Error("No response received from ZeroMQ server.");
+            }
 
             const response = JSON.parse(result.toString());
-            
             return { success: true, response };
         } catch (error) {
             return { success: false, error };
         } finally {
-            await this.delay(50);
-            await this.socket.close();
-        }
-    }
-
-    async callRagOnce(payload: any){
-        try {
-            const {success: sendSuccess,  error: sendError} = await this.send(payload)
-            if(!sendSuccess){
-                return {success: false, error: sendError}
-            }
-
-            const {success : recieveSuceess, response, error: revieveError} = await this.revieve()
-            if(!recieveSuceess){
-                return {success: false, error: revieveError}
-            }
-
-            return {success: true, response}
-
-        } catch (error) {
-            return { success: false, error };
+            await this.delay(50); // Ensure response is fully handled
+            await socket.close();
         }
     }
 }

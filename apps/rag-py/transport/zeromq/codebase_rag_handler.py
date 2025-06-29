@@ -9,20 +9,15 @@ import time
 import os
 from config.settings import settings
 from core.codebase.check_existing_collection import check_existing_collection
+from services.session_manager import SessionManager
 
 logger = logging.getLogger(__name__)
 configure_logging()
 
 
-def retrieve_data(collection_name: str, query:str):
 
-    logger.info(f"Retrieving Started for: {collection_name}")
-    start_time = time.time()
-    vectorstore = get_vectorstore(collection_name)
-    retriever = Retriever(vectorstore=vectorstore)
-    results = retriever.invoke(query)
 
-    # Step 4: Format results
+def format_codebase_results(results, collection_name, query, start_time):
     formatted_results = []
     for doc in results:
         metadata = doc.metadata
@@ -32,7 +27,7 @@ def retrieve_data(collection_name: str, query:str):
                 'file_path': metadata.get('file_path'),
                 'entity_name': metadata.get('entity_name'),
                 'code': doc.page_content,
-                'description' : metadata.get('description'),
+                'description': metadata.get('description'),
             }
         ))
 
@@ -40,12 +35,52 @@ def retrieve_data(collection_name: str, query:str):
     logger.info(f"Query returned {len(formatted_results)} results in {duration:.2f} seconds")
 
     return {
-        "success": True,
         "collection": collection_name,
         "query": query,
         "duration_seconds": round(duration, 2),
         "results": formatted_results
     }
+
+
+def retrieve_data(collection_name: str, query:str):
+
+    logger.info(f"Retrieving Started for: {collection_name}")
+    start_time = time.time()
+    vectorstore = get_vectorstore(collection_name)
+    retriever = Retriever(vectorstore=vectorstore)
+    results = retriever.invoke(query)
+    return format_codebase_results(results)
+
+def handle_chat(request):
+    chat_type = request.get("chat_type", "").strip().lower()
+    print(f">> chat_type: {chat_type}")
+    if chat_type == "init_chat":
+            print("\n>> Inside init_chat")
+            chat = SessionManager(request)
+            response = chat.initialize_session()
+            if not response.get("success"):
+                err = response.get("error")
+                logger.error(f"Chat initialization Failed: {err}")
+                return {"success": False, "error": str(err)}
+            return {"msg": "Chat Session Created"}
+
+    elif chat_type == "chat_message":
+        print("\n>> Inside chat_message")
+        chat = SessionManager(request)
+        response = chat.query_session()
+        if not response.get("success"):
+            err = response.get("error")
+            logger.error(f"Chat Query Failed: {err}")
+            return {"success": False, "error": str(err)} 
+        results = response.get("results")
+        collection_name = response.get("collection_name")
+        data = format_codebase_results(results, collection_name, chat.query, time.time())  
+        return {'success': True, 'type': request.get('type'), 'data': data }
+
+    else:
+        print(f"\n>> Unknown chat_type: {chat_type}")
+        return {"success": False, "error": f"Unknown chat_type: {chat_type}"}
+
 
 def codebase_rag_handler(request):
     try:
@@ -53,19 +88,12 @@ def codebase_rag_handler(request):
         parsedCodebase = request.get('parsedCodebase')
         query = request.get('query')
 
-        logger.info(f"Codebase Path: {path}")
-        COLLECTION_NAME = sanitize_collection_name(path)
-        logger.info(f"Sanitized collection name: {COLLECTION_NAME}")
+        print(f"\n\n>> Incoming request: {request}\n")
+        chat_type = request.get("chat_type", "").strip().lower()
+        print(f">> chat_type: {chat_type}")
 
-        os.environ['USER_AGENT'] = settings.USER_AGENT
-
-
-        isCollectionExist = check_existing_collection(COLLECTION_NAME) 
-        print(isCollectionExist)
-        if isCollectionExist:
-            data = retrieve_data(COLLECTION_NAME, query)
-            return data
-        
+        if chat_type == 'init_chat' or chat_type == 'chat_message':
+            return handle_chat(request)
 
 
         # Create embeddings

@@ -3,6 +3,7 @@ import { summarizeFunctionsWithDescriptions } from "../../agents/functionSummari
 import chalk from "chalk";
 import callRAG, { RagClient } from "../../../transport/zeromqClient";
 import { getCompletionFromOpenRouter } from "../../agents/ragAnswerAI";
+import { formatContextForLLM } from "../../../utils/formatContext";
 
 type CodeEntity = {
     entity_name: string;
@@ -21,23 +22,7 @@ interface QueryData {
     type: 'codebase';
 }
 
-// Prettify and format only required context fields for LLM
-function formatContextForLLM(context: any): string {
-    const results = Array.isArray(context?.results) ? context.results : context;
 
-    return results
-        .map(([, item]: [any, any]) => {
-            const { file_path, entity_name, code, description } = item;
-
-            return (
-                `🔹 **${entity_name}**\n` +
-                `📁 File: ${file_path}\n` +
-                (description ? `📝 Description: ${description}\n` : "") +
-                `\`\`\`ts\n${code.trim()}\n\`\`\`\n`
-            );
-        })
-        .join("\n");
-}
 
 const Rag = new RagClient();
 
@@ -70,7 +55,7 @@ const indexCodebase = async (data: QueryData) => {
         console.log(chalk.greenBright("📥 Context Received"));
 
         // Format for LLM
-        const formattedContext = formatContextForLLM(context);
+        const formattedContext = formatContextForLLM(context, 'codebase');
 
         // LLM reasoning
         console.log(chalk.yellow("🧠 Performing LLM Reasoning..."));
