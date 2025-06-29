@@ -7,6 +7,7 @@ import { runLangGraphAgent } from "../core/agents/langgraphAgent";
 import { chatWithContext } from "./commands/chat";
 import { printWelcomeScreen } from "./ui/WellcomeScreen";
 import { printHelpScreen } from "./ui/printHelpScreen";
+import indexCodebase from "../core/tools/code/indexCodebase";
 
 program
   .name("codr")
@@ -60,6 +61,21 @@ program
       await chatWithContext({ path: opts.path, query: opts.query, type: 'doc' });
     } else {
       await queryWebsite({ path: opts.path, query: opts.query, type: 'doc' });
+    }
+  });
+
+program
+  .command("codebase")
+  .description("Chat with (only js/ts and python supported)")
+  .requiredOption("-p, --path <path>")
+  .requiredOption("-q, --query <query>")
+  .option("--chat", "Open persistent chat UI")
+  .action(async (opts) => {
+    if (opts.chat) {
+      console.log(chalk.bgYellow.black("from doc --chat"));
+      await chatWithContext({ path: opts.path, query: opts.query, type: 'codebase' });
+    } else {
+      await indexCodebase({ path: opts.path, query: opts.query, type: 'codebase' });
     }
   });
 
