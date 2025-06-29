@@ -1,0 +1,21 @@
+|--- package.json
+|--- README.md
+|--- src
+|   |--- py
+|   |   |--- parser
+|   |--- ts
+|   |   |--- index.ts
+|   |   |--- parser
+|   |   |   |--- classParser.ts
+|   |   |   |--- extractCodeEntities.ts
+|   |   |   |--- functionParser.ts
+|   |   |--- shared
+|   |   |   |--- types
+|   |   |   |   |--- codeEntity.types.ts
+|   |   |--- utils
+|   |   |   |--- shared
+|   |   |   |   |--- ts
+|   |   |   |--- ts
+|   |   |   |   |--- helper.ts
+|--- str.txt
+|--- tsconfig.json
