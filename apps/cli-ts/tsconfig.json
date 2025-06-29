@@ -25,6 +25,9 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
+    "noPropertyAccessFromIndexSignature": false,
+    "paths": {
+      "@codebase": ["a:/Projects/Ai-code-writer/apps/codebase/index.ts"]
+    }
   }
 }

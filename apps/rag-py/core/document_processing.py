@@ -23,7 +23,8 @@ def load_and_split_documents(path: str, req_type: str) -> List[Document]:
         )
         
         splits = text_splitter.split_documents(docs)
-        logger.info(f"Split into {len(splits)} chunks")        return splits
+        logger.info(f"Split into {len(splits)} chunks")        
+        return splits
     except Exception as e:
         logger.error(f"Failed to load documents: {e}")
         raise

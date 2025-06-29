@@ -10,7 +10,7 @@ import { getSummarizeChat } from '../core/agents/chatSummarizer';
 interface CallRAG {
     path?: string;
     query?: string;
-    type?: 'doc' | 'webpage';
+    type?: string;
     session_id?: string;
 }
 
@@ -21,10 +21,10 @@ const callRAG = async (data: CallRAG) => {
     const socket = new zmq.Request();
 
     try {
-        await socket.connect("tcp://127.0.0.1:5555");
+        await socket.connect("tcp://127.0.0.1:5500");
 
         await delay(100);
-
+        // data.type = 'check_collection'
         const start = Date.now();
         await socket.send(JSON.stringify(data));
 
@@ -48,6 +48,68 @@ const callRAG = async (data: CallRAG) => {
 
 export default callRAG;
 
+export class RagClient {
+    private socket: zmq.Request;
+    private endpoint: string;
+    private previousSummary = '';
+
+    constructor(endpoint = 'tcp://127.0.0.1:5500') {
+        this.socket = new zmq.Request()
+        this.endpoint = endpoint
+    }
+
+    private async delay(ms: number) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    async send(payload: any) {
+        try {
+            await this.socket.connect(this.endpoint);
+            await this.delay(100)
+
+            await this.socket.send(JSON.stringify(payload))
+            return { success: true };
+        } catch (error) {
+            return { success: false, error };
+        }
+    }
+
+    async revieve() {
+        try {
+            const [result] = await this.socket.receive();
+            if (!result) throw new Error("No response received from ZeroMQ server.");
+
+
+            const response = JSON.parse(result.toString());
+            
+            return { success: true, response };
+        } catch (error) {
+            return { success: false, error };
+        } finally {
+            await this.delay(50);
+            await this.socket.close();
+        }
+    }
+
+    async callRagOnce(payload: any){
+        try {
+            const {success: sendSuccess,  error: sendError} = await this.send(payload)
+            if(!sendSuccess){
+                return {success: false, error: sendError}
+            }
+
+            const {success : recieveSuceess, response, error: revieveError} = await this.revieve()
+            if(!recieveSuceess){
+                return {success: false, error: revieveError}
+            }
+
+            return {success: true, response}
+
+        } catch (error) {
+            return { success: false, error };
+        }
+    }
+}
 
 export const startChatSession = async ({ path, query, type }: CallRAG) => {
 
@@ -61,12 +123,12 @@ export const startChatSession = async ({ path, query, type }: CallRAG) => {
         session_id
     };
 
-    const {success, response} = await callRAG(payload);
-    
-    console.log(chalk.greenBright(response.msg));
-    
+    const { success, response } = await callRAG(payload);
 
-    return { session_id,  query };
+    console.log(chalk.greenBright(response.msg));
+
+
+    return { session_id, query };
 };
 
 
@@ -89,17 +151,17 @@ export async function sendChatMessageToRag({ message, session_id }: { message: s
         assistant_answer: decision
     };
 
-    void (async () => {
-        const { success, decision: newSummary } = await getSummarizeChat({
-            chat: currentChat,
-            prevSummary: previousSummary
-        });
+    // void (async () => {
+    //     const { success, decision: newSummary } = await getSummarizeChat({
+    //         chat: currentChat,
+    //         prevSummary: previousSummary
+    //     });
 
-        if (success && newSummary) {
-            previousSummary = newSummary;
-            console.log("📝 Chat Summary Updated.");
-        }
-    })();
+    //     if (success && newSummary) {
+    //         previousSummary = newSummary;
+    //         console.log("📝 Chat Summary Updated.");
+    //     }
+    // })();
 
     return decision;
 }

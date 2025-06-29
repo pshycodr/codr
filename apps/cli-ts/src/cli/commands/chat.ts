@@ -5,7 +5,7 @@ import { startChatUI } from "../ui/chatUI";
 interface CallRAG {
     path?: string;
     query: string;
-    type?: 'doc' | 'webpage';
+    type?: 'doc' | 'webpage' | 'codebase';
 }
 
 export const chatWithContext = async (data: CallRAG) => {
