@@ -1,7 +1,7 @@
 from services.rag_pipeline import run_rag_pipeline, init_session
 session_store = {}
 
-def handle_rag_request(request: dict) -> dict:
+def docs_rag_handler(request: dict) -> dict:
     chat_type = request.get("chat_type")
 
     if chat_type == "init_chat":

@@ -51,3 +51,13 @@ def initialize_vectorstore(collection_name: str, documents: List[Document] = Non
     except Exception as e:
         logger.error(f"Vectorstore initialization failed: {e}")
         raise
+
+def get_vectorstore(collection_name: str) -> Chroma:
+    client = get_chroma_client()
+    embeddings = get_embeddings()
+    return Chroma(
+        client=client,
+        collection_name=collection_name,
+        embedding_function=embeddings,
+        persist_directory=settings.PERSIST_DIR,
+    )
