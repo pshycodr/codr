@@ -4,13 +4,12 @@ import fs from "fs";
 import { extractCodeEntities as extractTSEntities } from "./src/ts/parser/extractCodeEntities";
 import type { CodeEntity } from "./src/ts/shared/types/codeEntity.types";
 import { fileURLToPath } from 'url';
-// 🔥 Main function
-export async function parseCodebase(folderPath: string): Promise<CodeEntity[]> {
 
+export async function parseCodebase(folderPath: string): Promise<CodeEntity[]> {
 
   const results: CodeEntity[] = [];
 
-  const ignoredDirs = ["node_modules", ".venv", "__pycache__", ".mypy_cache", "pyenv", "myenv", ".git", "venv"];
+  const ignoredDirs = [".vs","node_modules", ".venv", "__pycache__", ".mypy_cache", "pyenv", "myenv", ".git", "venv", 'dist'];
 
   async function walk(dir: string) {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -70,7 +69,7 @@ async function runPythonParser(filePath: string): Promise<CodeEntity[]> {
     return JSON.parse(output);
   } catch (err) {
     console.error(`❌ Failed to parse Python parser output for ${filePath}`, err);
-    console.error(`   Raw output was: "${output}"`); // Log the raw output
+    console.error(`   Raw output was: "${output}"`);
     return [];
   }
 }

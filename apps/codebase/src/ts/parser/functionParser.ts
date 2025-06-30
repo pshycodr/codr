@@ -5,7 +5,7 @@ import { getCodeFromLines } from "../utils/helper";
 export function extractFunctions(node: Node, lines: string[], filePath: string): CodeEntity[] {
   const results: CodeEntity[] = [];
 
-  // ✅ FunctionDeclaration
+  // FunctionDeclaration
   if (node.getKind() === SyntaxKind.FunctionDeclaration) {
     const fn = node.asKind(SyntaxKind.FunctionDeclaration);
     if (fn && fn.getName()) {
@@ -24,7 +24,7 @@ export function extractFunctions(node: Node, lines: string[], filePath: string):
     }
   }
 
-  // ✅ VariableStatement for arrow/function expressions
+  // VariableStatement for arrow/function expressions
   if (node.getKind() === SyntaxKind.VariableStatement) {
     const vs = node.asKind(SyntaxKind.VariableStatement);
     if (vs) {

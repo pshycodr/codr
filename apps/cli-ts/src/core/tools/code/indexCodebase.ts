@@ -37,10 +37,11 @@ const indexCodebase = async (data: QueryData) => {
             const parsed = await parseCodebase(data.path);
             console.log(chalk.cyanBright("📄 Parsed:"), parsed?.length, "items");
 
-            const summarized = await summarizeFunctionsWithDescriptions(parsed);
-            console.log(chalk.cyanBright("🧠 Summarized:"), summarized?.length, "items");
+            // const summarized = await summarizeFunctionsWithDescriptions(parsed);
+            // console.log(chalk.cyanBright("🧠 Summarized:"), summarized?.length, "items");
 
-            data.parsedCodebase = summarized;
+            // data.parsedCodebase = summarized;
+            data.parsedCodebase = parsed
         }
 
         // RAG context fetch
