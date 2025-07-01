@@ -1,6 +1,6 @@
 import blessed from 'blessed';
 // import { sendChatMessageToRag } from '../../transport/zeromqClient';
-import type { ChatSessionManager } from '../../transport/chatSessionManager';
+import type { ChatSessionManager } from "@transport/chatSessionManager";
 
 export async function startChatUI(session_id: string, query: string, firstMessage: string, chatManager: ChatSessionManager) {
   const screen = blessed.screen({

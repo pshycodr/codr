@@ -26,8 +26,14 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
+    "baseUrl": ".",
     "paths": {
-      "@codebase": ["a:/Projects/Ai-code-writer/apps/codebase/index.ts"]
+      "@codebase": ["../codebase/index.ts"],
+      "@utils/*": ["src/utils/*"],
+      "@transport/*": ["src/transport/*"],
+      "@nodes/*": ["src/nodes/*"],
+      "@core/*": ["src/core/*"],
+      "@cli/*": ["src/cli/*"],
     }
   }
 }

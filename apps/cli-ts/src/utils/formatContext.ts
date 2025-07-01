@@ -8,10 +8,10 @@ export default function formatContext(chunks: string[]): string {
 
 // utils/formatContext.ts
 
-type ContextType = 'docs' | 'codebase' ;
+type ContextType = 'doc' | 'codebase' ;
 
 export function formatContextForLLM(context: any, type: ContextType): string {
-    if (type === 'docs') {
+    if (type === 'doc') {
         const chunks: string[] = Array.isArray(context) ? context : context?.results || [];
         return chunks
             .map((chunk, i) => `(${i + 1}) ${chunk.trim()}`)

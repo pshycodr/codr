@@ -52,11 +52,11 @@ def retrieve_data(collection_name: str, query:str):
     return format_codebase_results(results, collection_name, query, time.time())
 
 def handle_chat(request):
+    chat = SessionManager(request)
     chat_type = request.get("chat_type", "").strip().lower()
     print(f">> chat_type: {chat_type}")
     if chat_type == "init_chat":
         print("\n>> Inside init_chat")
-        chat = SessionManager(request)
         response = chat.initialize_session()
         if not response.get("success"):
             err = response.get("error")
@@ -66,7 +66,6 @@ def handle_chat(request):
 
     elif chat_type == "chat_message":
         print("\n>> Inside chat_message")
-        chat = SessionManager(request)
         response = chat.query_session()
         if not response.get("success"):
             err = response.get("error")

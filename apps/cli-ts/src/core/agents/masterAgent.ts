@@ -3,7 +3,7 @@
 import { MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
 import { HumanMessage } from "@langchain/core/messages";
-import { tools, llmWithTools } from "@nodes/index";
+import { tools, llmWithTools } from "@nodes/index"; 
 
 async function llmCall(state: typeof MessagesAnnotation.State) {
   const result = await llmWithTools.invoke([
@@ -57,7 +57,7 @@ const agentGraph = new StateGraph(MessagesAnnotation)
 
 const app = agentGraph.compile();
 
-export async function runLangGraphAgent(prompt: string) {
+export async function runMasterAgent(prompt: string) {
   const result = await app.invoke({ messages: [new HumanMessage(prompt)] }, { recursionLimit: 50 });
   console.log(result.messages.at(-1)?.content);
   // return(result.messages.at(-1)?.content)

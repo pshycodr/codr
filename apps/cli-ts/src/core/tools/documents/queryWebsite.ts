@@ -1,6 +1,6 @@
 import chalk from "chalk";
-import callRAG from "../../../transport/zeromqClient";
-import formatContext from "../../../utils/formatContext";
+import callRAG from "@transport/zeromqClient";
+import formatContext from "@utils/formatContext";
 
 interface QueryData {
     path: string;

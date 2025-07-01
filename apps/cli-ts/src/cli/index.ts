@@ -2,12 +2,12 @@ import { program } from "commander";
 import chalk from "chalk";
 
 
-import { queryWebsite } from "../core/tools/documents/queryWebsite";
-import { runLangGraphAgent } from "../core/agents/langgraphAgent";
+import { queryWebsite } from "@core/tools/documents/queryWebsite";
+import { runLangGraphAgent } from "@core/agents/langgraphAgent";
 import { chatWithContext } from "./commands/chat";
 import { printWelcomeScreen } from "./ui/WellcomeScreen";
 import { printHelpScreen } from "./ui/printHelpScreen";
-import indexCodebase from "../core/tools/code/indexCodebase";
+import indexCodebase from "@core/tools/code/indexCodebase";
 
 program
   .name("codr")

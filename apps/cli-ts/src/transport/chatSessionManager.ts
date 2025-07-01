@@ -1,9 +1,9 @@
 import { randomUUID } from "crypto";
 import type { RagClient } from "./zeromqClient";
 import formatContext, { formatContextForLLM } from "../utils/formatContext";
-import { getCompletionFromOpenRouter } from "../core/agents/ragAnswerAI";
+import { getCompletionFromOpenRouter } from "../utils/AI/ragAnswerAI";
 import chalk from "chalk";
-import { getSummarizeChat } from "../core/agents/chatSummarizer";
+import { getSummarizeChat } from "../utils/AI/chatSummarizer";
 
 
 export class ChatSessionManager {
@@ -42,7 +42,7 @@ export class ChatSessionManager {
 
         const { success, response, error } = await this.ragClient.callRagOnce(payload);
 
-        // console.log(success, response);
+        // console.log(success, response, response.type);
         
 
         if (!success || !response?.success) {

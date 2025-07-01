@@ -1,9 +1,9 @@
 import { parseCodebase } from "@codebase";
-import { summarizeFunctionsWithDescriptions } from "../../agents/functionSummarize";
+import { summarizeFunctionsWithDescriptions } from "@utils/AI/functionSummarize";
 import chalk from "chalk";
-import callRAG, { RagClient } from "../../../transport/zeromqClient";
-import { getCompletionFromOpenRouter } from "../../agents/ragAnswerAI";
-import { formatContextForLLM } from "../../../utils/formatContext";
+import callRAG, { RagClient } from "@transport/zeromqClient";
+import { getCompletionFromOpenRouter } from "@utils/AI/ragAnswerAI";
+import { formatContextForLLM } from "@utils/formatContext";
 
 type CodeEntity = {
     entity_name: string;

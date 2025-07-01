@@ -54,7 +54,7 @@ class ZeroMQServer:
             print(identity, msg_bytes)
 
             request = json.loads(msg_bytes.decode())
-            logger.info(f"Received request from {identity}: {request}")
+            logger.info(f"Received request from {identity}")
 
             self.clients[identity] = {}
 

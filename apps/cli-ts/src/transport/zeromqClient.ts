@@ -4,8 +4,8 @@ import { randomUUID } from 'crypto';
 
 import zmq from 'zeromq';
 import formatContext from '../utils/formatContext';
-import { getCompletionFromOpenRouter } from '../core/agents/ragAnswerAI';
-import { getSummarizeChat } from '../core/agents/chatSummarizer';
+import { getCompletionFromOpenRouter } from '../utils/AI/ragAnswerAI';
+import { getSummarizeChat } from '../utils/AI/chatSummarizer';
 
 interface CallRAG {
     path?: string;
@@ -84,46 +84,6 @@ export class RagClient {
     }
 }
 
-export const startChatSession = async ({ path, query, type }: CallRAG) => {
-
-    const session_id = randomUUID();
-
-    const payload = {
-        chat_type: "init_chat",
-        path,
-        query,
-        type,
-        session_id
-    };
-
-    const { success, response } = await callRAG(payload);
-
-    console.log(chalk.greenBright(response.msg));
-
-
-    return { session_id, query };
-};
-
-
-let previousSummary = "";
-
-export async function sendChatMessageToRag({ message, session_id }: { message: string, session_id: string }) {
-    const payload = {
-        chat_type: "chat_message",
-        message,
-        session_id
-    };
-
-    const { success: ragSuccess, response: context } = await callRAG(payload);
-    const formattedContext = formatContext(context.results);
-
-    const { decision } = await getCompletionFromOpenRouter({ query: message, context: formattedContext, summary: previousSummary });
-
-    const currentChat = {
-        user_query: message,
-        assistant_answer: decision
-    };
-
     // void (async () => {
     //     const { success, decision: newSummary } = await getSummarizeChat({
     //         chat: currentChat,
@@ -135,6 +95,3 @@ export async function sendChatMessageToRag({ message, session_id }: { message: s
     //         console.log("📝 Chat Summary Updated.");
     //     }
     // })();
-
-    return decision;
-}

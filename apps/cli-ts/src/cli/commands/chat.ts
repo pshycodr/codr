@@ -1,7 +1,7 @@
 import chalk from "chalk";
-import { RagClient, sendChatMessageToRag, startChatSession } from "../../transport/zeromqClient"
-import { startChatUI } from "../ui/chatUI";
-import { ChatSessionManager } from "../../transport/chatSessionManager";
+import { RagClient} from "@transport/zeromqClient"
+import { startChatUI } from "@cli/ui/chatUI";
+import { ChatSessionManager } from "@transport/chatSessionManager";
 import { message } from "blessed";
 
 interface CallRAG {
@@ -16,7 +16,7 @@ export const chatWithContext = async (data: CallRAG) => {
 
     const { session_id, query } = await chatManager.startSession(data)
 
-    // console.log(chalk.bgCyanBright.black("Initial Response: "), response);
+    console.log(chalk.bgCyanBright.black("Initial Response: "),session_id, query, data.type);
 
     if (!query) throw new Error("Query is required to start chat");
 
