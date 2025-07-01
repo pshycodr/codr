@@ -1,6 +1,6 @@
 import { tool } from "@langchain/core/tools"
 import { z } from "zod"
-import { llm } from "../llm/gemini"
+import { llm } from "@llm/gemini"
 import createFolder from "./files/createFolders"
 import runCommand from "./runCommand"
 import createFiles from "./files/createFiles"

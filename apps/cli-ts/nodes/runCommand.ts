@@ -2,6 +2,8 @@ import chalk from "chalk";
 import inquirer from "inquirer";
 import { exec } from "child_process";
 import util from "util";
+import os from "os";
+import path from "path";
 
 const execPromise = util.promisify(exec);
 
@@ -25,6 +27,11 @@ const isDangerous = (command: string): boolean => {
   return DANGEROUS_COMMAND_PATTERNS.some((pattern) => pattern.test(command));
 };
 
+// Escape double quotes for bash -c
+const escapeForBash = (cmd: string): string => {
+  return cmd.replace(/"/g, '\\"');
+};
+
 const runCommand = async ({ command }: { command: string }): Promise<RunCommandResult> => {
   console.log(chalk.bgGreen.black("⚙️  runCommand called"));
   console.log(chalk.cyan("🔹 Command Received:"), chalk.yellow(command));
@@ -37,7 +44,7 @@ const runCommand = async ({ command }: { command: string }): Promise<RunCommandR
     {
       type: "confirm",
       name: "confirm",
-      message: chalk.yellow("Do you want to execute this command?"),
+      message: chalk.yellow("✔ Do you want to execute this command?"),
       default: false,
     },
   ]);
@@ -48,8 +55,14 @@ const runCommand = async ({ command }: { command: string }): Promise<RunCommandR
     return { success: false, error: msg };
   }
 
+  const isWindows = os.platform() === "win32";
+
   try {
-    const { stdout } = await execPromise(command);
+    const finalCommand = isWindows
+      ? `bash -c "${escapeForBash(command)}"` // Use Git Bash
+      : command;
+
+    const { stdout } = await execPromise(finalCommand);
     console.log(chalk.greenBright("✅ Command executed successfully.\n"));
     console.log(chalk.gray(stdout));
     return { success: true, stdout };

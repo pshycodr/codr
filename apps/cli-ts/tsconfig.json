@@ -29,11 +29,12 @@
     "baseUrl": ".",
     "paths": {
       "@codebase": ["../codebase/index.ts"],
-      "@utils/*": ["src/utils/*"],
-      "@transport/*": ["src/transport/*"],
-      "@nodes/*": ["src/nodes/*"],
+      "@utils/*": ["utils/*"],
+      "@transport/*": ["transport/*"],
+      "@nodes/*": ["nodes/*"],
       "@core/*": ["src/core/*"],
       "@cli/*": ["src/cli/*"],
+      "@llm/*": ["src/llm/*"],
     }
   }
 }
