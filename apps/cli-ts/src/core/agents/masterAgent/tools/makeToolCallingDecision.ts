@@ -1,5 +1,6 @@
 import chalk from "chalk";
-import { tools } from ".";
+import { fileTools } from "@core/agents/fileAgent/fileTools"; 
+import { codeTools } from "@core/agents/codeAgent/CodeTools";
 
 export const makeToolCallingDecision = async (task: string) => {
     console.log(chalk.bgGreen("makeToolCallingDecision Called"));
@@ -33,7 +34,7 @@ export const makeToolCallingDecision = async (task: string) => {
                       "${task}"
                       
                       Available Tools:
-                      ${tools.map(t => `- ${t.name}: ${t.description}`).join("\n")}
+                      ${fileTools.map(t => `- ${t.name}: ${t.description}`).join("\n")}
                       
                       Now, analyze the task and return a detailed, step-by-step plan using the tools provided.
                       Only return the plan, nothing else.

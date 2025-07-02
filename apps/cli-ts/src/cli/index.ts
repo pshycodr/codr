@@ -3,11 +3,11 @@ import chalk from "chalk";
 
 
 import { queryWebsite } from "@core/tools/documents/queryWebsite";
-import { runLangGraphAgent } from "@core/agents/langgraphAgent";
 import { chatWithContext } from "./commands/chat";
 import { printWelcomeScreen } from "./ui/WellcomeScreen";
 import { printHelpScreen } from "./ui/printHelpScreen";
 import indexCodebase from "@core/tools/code/indexCodebase";
+import { runMasterAgent } from "@core/agents/masterAgent/masterAgent";
 
 program
   .name("codr")
@@ -31,7 +31,7 @@ program
   .argument("<prompt...>")
   .action(async (prompt) => {
     const msg = prompt.join(" ");
-    await runLangGraphAgent(msg);
+    await runMasterAgent(msg);
   });
 
 program

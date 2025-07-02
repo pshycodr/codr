@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import fs from 'fs/promises';
-import { resolvePath } from '../../utils/resolvePath';
+import { resolvePath } from "@utils/resolvePath"
 
 
 const readFile = async ({ fileName }: { fileName: string }) => {

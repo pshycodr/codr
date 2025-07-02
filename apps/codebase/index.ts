@@ -6,7 +6,7 @@ import type { CodeEntity } from "./src/ts/shared/types/codeEntity.types";
 import { fileURLToPath } from 'url';
 
 export async function parseCodebase(folderPath: string): Promise<CodeEntity[]> {
-
+  
   const results: CodeEntity[] = [];
 
   const ignoredDirs = [".vs","node_modules", ".venv", "__pycache__", ".mypy_cache", "pyenv", "myenv", ".git", "venv", 'dist'];
