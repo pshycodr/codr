@@ -5,20 +5,40 @@ import type { CodeEntity } from "../shared/types/codeEntity.types";
 import { extractFunctions } from "./functionParser";
 import { extractClasses } from "./classParser";
 
-export function extractCodeEntities(filePath: string): CodeEntity[] {
-  const ext = path.extname(filePath);
-  
-  if (![".ts", ".js"].includes(ext)) return [];
+// Initialize the Project only once (optional singleton)
+const project = new Project({
+  compilerOptions: {
+    allowJs: true,
+    jsx: 2, // 👈 Support for .tsx and .jsx
+    target: 2,     // ES6
+    module: 1 ,
+    checkJs: false    // CommonJS
+  },
+  useInMemoryFileSystem: false
+});
 
-  const fileContent = fs.readFileSync(filePath, "utf-8");
+
+export function extractCodeEntities(filePath: string): CodeEntity[] {
+  const ext = path.extname(filePath).toLowerCase();
+
+  if (![".ts", ".js", ".jsx", ".tsx"].includes(ext)) return [];
+
+  let fileContent: string;
+  try {
+    fileContent = fs.readFileSync(filePath, "utf-8");
+  } catch (err) {
+    console.warn(`⚠️ Failed to read file: ${filePath}`, err);
+    return [];
+  }
+
   const fileLines = fileContent.split("\n");
 
-  const project = new Project({
-    compilerOptions: { allowJs: true },
-    useInMemoryFileSystem: false,
-  });
-
-  const sourceFile = project.createSourceFile("temp" + ext, fileContent, { overwrite: true });
+  // Use a temporary virtual file (avoids modifying real files)
+  const sourceFile = project.createSourceFile(
+    "virtual" + ext,
+    fileContent,
+    { overwrite: true }
+  );
 
   const results: CodeEntity[] = [];
 
@@ -26,6 +46,9 @@ export function extractCodeEntities(filePath: string): CodeEntity[] {
     results.push(...extractFunctions(node, fileLines, filePath));
     results.push(...extractClasses(node, fileLines, filePath));
   });
+
+  // Optionally remove the virtual file to avoid memory overhead
+  project.removeSourceFile(sourceFile);
 
   return results;
 }

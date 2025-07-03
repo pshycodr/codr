@@ -1,4 +1,16 @@
-import { Project, SyntaxKind, FunctionDeclaration, VariableDeclaration, ArrowFunction, SourceFile, Node, Identifier, CallExpression, ImportDeclaration, VariableStatement } from 'ts-morph';
+import {
+  Project,
+  SyntaxKind,
+  FunctionDeclaration,
+  VariableDeclaration,
+  ArrowFunction,
+  SourceFile,
+  Node,
+  Identifier,
+  CallExpression,
+  ImportDeclaration,
+  VariableStatement,
+} from 'ts-morph';
 import fs from 'fs';
 import path from 'path';
 
@@ -25,7 +37,31 @@ interface FunctionMeta {
   variablesWritten?: string[];
 }
 
-const project = new Project();
+// ✅ ENABLE JSX/TSX parsing
+const project = new Project({
+  compilerOptions: {
+    allowJs: true,
+    jsx: 2, // React
+    target: 2,
+    module: 1,
+    checkJs: false,
+  },
+});
+
+project.addSourceFilesAtPaths([
+  'src/**/*.{ts,tsx,js,jsx}',
+  'components/**/*.{ts,tsx,js,jsx}',
+  '!**/node_modules/**/*',
+  '!**/dist/**/*',
+  '!**/build/**/*',
+  '!**/out/**/*',
+  '!**/.next/**/*',
+  '!**/.vercel/**/*',
+  '!**/.vscode/**/*',
+  '!**/.idea/**/*',
+  '!**/.github/**/*',
+  '!**/coverage/**/*',
+]);
 
 function extractFunctionMeta(sourceFile: SourceFile): FunctionMeta[] {
   const results: FunctionMeta[] = [];
@@ -61,8 +97,8 @@ function buildFunctionMeta(
   sourceFile: SourceFile,
   isArrowFunction: boolean = false
 ): FunctionMeta {
-  const signature = node.getSignature();
-  const body = node.getBody();
+  const signature = node.getSignature?.();
+  const body = node.getBody?.();
 
   const calls = new Set<string>();
   const variablesRead = new Set<string>();
@@ -98,18 +134,18 @@ function buildFunctionMeta(
   return {
     name,
     filePath: sourceFile.getFilePath(),
-    startLine: node.getStartLineNumber(),
-    endLine: node.getEndLineNumber(),
+    startLine: node.getStartLineNumber?.() || 0,
+    endLine: node.getEndLineNumber?.() || 0,
     isExported: isExportedNode(node),
     isAsync: node.isAsync?.() || false,
     isArrowFunction,
     parameters: node.getParameters().map(param => ({
       name: param.getName(),
-      type: param.getType().getText(),
+      type: param.getType().getText() || 'any',
       isOptional: param.isOptional?.() || false,
       defaultValue: param.getInitializer()?.getText(),
     })),
-    returnType: signature.getReturnType().getText(),
+    returnType: signature?.getReturnType().getText() || 'void',
     docstring: node.getJsDocs().map(doc => doc.getComment()).filter(Boolean).join('\n'),
     description: node.getJsDocs().map(doc => doc.getDescription()).filter(Boolean).join('\n'),
     calls: [...calls],
@@ -123,7 +159,7 @@ function writeMetadataToFile(metadata: FunctionMeta[], outputPath: string) {
   const resolved = path.resolve(outputPath);
   fs.mkdirSync(path.dirname(resolved), { recursive: true });
   fs.writeFileSync(resolved, JSON.stringify(metadata, null, 2), 'utf-8');
-  console.log(`Metadata written to ${resolved}`);
+  console.log(`✅ Metadata written to ${resolved}`);
 }
 
 function generateFunctionMetadata() {

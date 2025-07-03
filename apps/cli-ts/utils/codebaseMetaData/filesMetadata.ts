@@ -5,7 +5,7 @@ import { statSync } from 'fs';
 
 export interface FileMeta {
   filePath: string;
-  language: "ts" | "js" | "py" | "go" | string;
+  language: "ts" | "js" | "py" | "go" | "jsx" | "tsx" | string;
   fileSize?: number;
   numLines?: number;
   imports: string[];
@@ -15,7 +15,30 @@ export interface FileMeta {
   dependencies?: string[];
 }
 
-const project = new Project();
+const project = new Project({
+  compilerOptions: {
+    allowJs: true,
+    jsx: 2, // React
+    target: 2,
+    module: 1,
+    checkJs: false,
+  },
+});
+
+project.addSourceFilesAtPaths([
+  'src/**/*.{ts,tsx,js,jsx}',
+  'components/**/*.{ts,tsx,js,jsx}',
+  '!**/node_modules/**/*',
+  '!**/dist/**/*',
+  '!**/build/**/*',
+  '!**/out/**/*',
+  '!**/.next/**/*',
+  '!**/.vercel/**/*',
+  '!**/.vscode/**/*',
+  '!**/.idea/**/*',
+  '!**/.github/**/*',
+  '!**/coverage/**/*',
+]);
 
 function getFileLanguage(filePath: string): string {
   const ext = path.extname(filePath).replace('.', '').toLowerCase();

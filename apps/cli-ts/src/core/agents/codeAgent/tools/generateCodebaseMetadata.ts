@@ -2,8 +2,10 @@ import { parseCodebase } from "@codebase";
 import callRAG, { RagClient } from "@transport/zeromqClient";
 import generateCallGraph from "@utils/codebaseMetaData/callgraph";
 import generateClassMetadata from "@utils/codebaseMetaData/classMetadata";
+import { generateCssMetadata } from "@utils/codebaseMetaData/cssMetadata";
 import generateFileMetadata from "@utils/codebaseMetaData/filesMetadata";
 import generateFunctionMetadata from "@utils/codebaseMetaData/functionMeta";
+import { generateHtmlMetadata } from "@utils/codebaseMetaData/htmlMetadata";
 import chalk from "chalk";
 import fs from "fs";
 import path from "path";
@@ -36,10 +38,17 @@ const generateCodebaseMetadata = async () => {
       path: dirname,
     });
 
-    if (fs.existsSync(metadataPath) && response.exists) {
-      console.log(".metadata folder exists ✅");
-      return "project .metadata folder already exists in the root folder and in the vector db";
-    }
+    generateCallGraph();
+    generateClassMetadata();
+    generateFileMetadata();
+    generateFunctionMetadata();
+    generateHtmlMetadata()
+    generateCssMetadata()
+
+    // if (fs.existsSync(metadataPath) && response.exists) {
+    //   console.log(".metadata folder exists ✅");
+    //   return "project .metadata folder already exists in the root folder and in the vector db";
+    // }
 
     if (!response.exists) {
       // Parse codebase
@@ -63,10 +72,6 @@ const generateCodebaseMetadata = async () => {
         return { success: false };
       }
 
-      generateCallGraph();
-      generateClassMetadata();
-      generateFileMetadata();
-      generateFunctionMetadata();
     }
 
     return "project .metadata folder and vector embeddings created successfully";

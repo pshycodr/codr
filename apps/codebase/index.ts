@@ -28,7 +28,7 @@ export async function parseCodebase(folderPath: string): Promise<CodeEntity[]> {
         // Create a promise for each file processing task
         const fileProcessingPromise = (async () => {
           const ext = path.extname(entry.name);
-          if (ext === ".ts" || ext === ".js") {
+          if (ext === ".ts" || ext === ".js" ||  ext === ".jsx" ||  ext === ".tsx") {
             const tsResults = extractTSEntities(fullPath);
             results.push(...tsResults);
           } else if (ext === ".py") {

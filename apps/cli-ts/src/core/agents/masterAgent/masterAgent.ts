@@ -23,6 +23,7 @@ async function llmCall(state: typeof MessagesAnnotation.State) {
       Code Agent Tools:
       ${codeTools.map(ct => `- ${ct.name}: ${ct.description}`).join("\n")}
       
+      ALWAYS REMEMBER : if you want user feedback use confirmAction tool.
       Crucial Directives:
       1. Allways Call the Agents with a proper detailed instruction and tools to use.
       2. Allways try to use the tools you have smartly 
@@ -64,7 +65,7 @@ const app = agentGraph.compile();
 export async function runMasterAgent(prompt: string) {
   const result = await app.invoke(
     { messages: [new HumanMessage(prompt)] },
-    { recursionLimit: 50 }
+    { recursionLimit: 100 }
   );
 
   const finalMessage = result.messages.at(-1);

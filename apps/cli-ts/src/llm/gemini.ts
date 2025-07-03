@@ -7,6 +7,6 @@ const envPath = path.resolve(__dirname, "../../.env");
 config({ path: envPath });
 
 export const llm = new ChatGoogleGenerativeAI ({
-  model: "gemini-2.0-flash",
+  model: "gemini-2.5-flash",
   apiKey: process.env.GEMINI_API_KEY
 });

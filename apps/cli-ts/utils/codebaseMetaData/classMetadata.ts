@@ -25,7 +25,30 @@ interface ClassMeta {
   docstring?: string;
 }
 
-const project = new Project();
+const project = new Project({
+  compilerOptions: {
+    allowJs: true,
+    jsx: 2, // React
+    target: 2,
+    module: 1,
+    checkJs: false,
+  },
+});
+
+project.addSourceFilesAtPaths([
+  'src/**/*.{ts,tsx,js,jsx}',
+  'components/**/*.{ts,tsx,js,jsx}',
+  '!**/node_modules/**/*',
+  '!**/dist/**/*',
+  '!**/build/**/*',
+  '!**/out/**/*',
+  '!**/.next/**/*',
+  '!**/.vercel/**/*',
+  '!**/.vscode/**/*',
+  '!**/.idea/**/*',
+  '!**/.github/**/*',
+  '!**/coverage/**/*',
+]);
 
 function extractClassMeta(sourceFile: SourceFile): ClassMeta[] {
   const results: ClassMeta[] = [];
