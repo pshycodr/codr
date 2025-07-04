@@ -49,7 +49,7 @@ const project = new Project({
 });
 
 project.addSourceFilesAtPaths([
-  'src/**/*.{ts,tsx,js,jsx}',
+  '**/*.{ts,tsx,js,jsx}',
   'components/**/*.{ts,tsx,js,jsx}',
   '!**/node_modules/**/*',
   '!**/dist/**/*',
@@ -178,7 +178,7 @@ function generateFunctionMetadata() {
     allMetadata.push(...metas);
   }
 
-  writeMetadataToFile(allMetadata, './.metadata/functions.json');
+  writeMetadataToFile(allMetadata, './.codr/metadata/functions.json');
 }
 
 export default generateFunctionMetadata;

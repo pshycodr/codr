@@ -47,7 +47,7 @@ export function generateCssMetadata() {
     results[file] = parseCssFile(file);
   }
 
-  const outPath = path.resolve(".metadata/css.json");
+  const outPath = path.resolve("./.codr/metadata/css.json");
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, JSON.stringify(results, null, 2), "utf-8");
   console.log(`✅ CSS metadata written to ${outPath}`);

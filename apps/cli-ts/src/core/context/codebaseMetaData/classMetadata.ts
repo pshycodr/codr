@@ -36,8 +36,7 @@ const project = new Project({
 });
 
 project.addSourceFilesAtPaths([
-  'src/**/*.{ts,tsx,js,jsx}',
-  'components/**/*.{ts,tsx,js,jsx}',
+  '**/*.{ts,tsx,js,jsx}',
   '!**/node_modules/**/*',
   '!**/dist/**/*',
   '!**/build/**/*',
@@ -108,7 +107,7 @@ function generateClassMetadata() {
     allClassMeta.push(...extractClassMeta(file));
   }
 
-  writeMetadataToFile(allClassMeta, './.metadata/classes.json');
+  writeMetadataToFile(allClassMeta, './.codr/metadata/classes.json');
 }
 
 export default generateClassMetadata;

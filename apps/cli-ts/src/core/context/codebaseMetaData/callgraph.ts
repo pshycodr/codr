@@ -27,8 +27,7 @@ const project = new Project({
 });
 
 project.addSourceFilesAtPaths([
-  'src/**/*.{ts,tsx,js,jsx}',
-  'components/**/*.{ts,tsx,js,jsx}',
+  '**/*.{ts,tsx,js,jsx}',
   '!**/node_modules/**/*',
   '!**/dist/**/*',
   '!**/build/**/*',
@@ -140,7 +139,7 @@ function generateCallGraph() {
     };
   });
 
-  const outputPath = path.resolve('./.metadata/callgraph.json');
+  const outputPath = path.resolve('./.codr/metadata/callgraph.json');
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   fs.writeFileSync(outputPath, JSON.stringify(graph, null, 2), 'utf-8');
   console.log(`Call graph written to ${outputPath}`);

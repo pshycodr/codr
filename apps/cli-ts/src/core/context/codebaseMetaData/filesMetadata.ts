@@ -26,8 +26,7 @@ const project = new Project({
 });
 
 project.addSourceFilesAtPaths([
-  'src/**/*.{ts,tsx,js,jsx}',
-  'components/**/*.{ts,tsx,js,jsx}',
+  '**/*.{ts,tsx,js,jsx}',
   '!**/node_modules/**/*',
   '!**/dist/**/*',
   '!**/build/**/*',
@@ -112,7 +111,7 @@ function generateFileMetadata() {
     allFileMeta.push(extractFileMeta(file));
   }
 
-  writeMetadataToFile(allFileMeta, './.metadata/files.json');
+  writeMetadataToFile(allFileMeta, './.codr/metadata/files.json');
 }
 
 export default generateFileMetadata;
