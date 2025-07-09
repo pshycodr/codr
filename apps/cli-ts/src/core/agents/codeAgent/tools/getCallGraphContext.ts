@@ -20,7 +20,7 @@ export function getCallGraphContext({fnName}:{fnName: string}): CallGraphContext
   console.log(chalk.bgYellow.black("codeAgent/getCallGraphContext Called"), fnName)
 
 
-  const callgraphPath = path.resolve('.metadata/callgraph.json');
+  const callgraphPath = path.resolve('./.codr/metadata/callgraph.json');
 
   if (!fs.existsSync(callgraphPath)) {
     console.log(chalk.red("❌ callgraph.json not found in .metadata."));

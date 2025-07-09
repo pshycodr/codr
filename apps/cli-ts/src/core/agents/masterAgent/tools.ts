@@ -7,6 +7,9 @@ import { makeToolCallingDecision } from "./tools/makeToolCallingDecision";
 import { llm } from "@llm/gemini";
 import { confirmAction } from "./tools/confirmAction";
 import goalPlanner from "./tools/goalPlanner";
+import { fileTools } from "../fileAgent/fileTools";
+import { codeTools } from "../codeAgent/CodeTools";
+import { webSearch } from "./tools/webSearch";
 
 const cliCommand = tool(runCommand, {
   name: "run_cli-command",
@@ -16,13 +19,6 @@ const cliCommand = tool(runCommand, {
   }),
 });
 
-const toolCallingDecision = tool(makeToolCallingDecision, {
-  name: "tool_calling_decision",
-  description: "Analyzes a user task and recommends which agent or tool to use with detailed instructions",
-  schema: z.object({
-    task: z.string().describe("A natural language task or instruction from the user"),
-  }),
-});
 
 const codeAgentTool = tool(runCodeAgent, {
   name: "code_agent",
@@ -56,12 +52,23 @@ const executionGoalPlanner = tool(goalPlanner, {
   }),
 });
 
+const searchOnWeb = tool(webSearch, {
+  name: "web_search",
+  description: "Searches the web for up-to-date information relevant to a user query. Useful when additional context, tutorials, latest documentation, or troubleshooting solutions are needed.",
+  schema: z.object({
+    query: z.string().describe("The natural language search string the user would type into a search engine, such as 'How to set up Tailwind with Vite in React' or 'Best way to handle file uploads in Next.js'.")
+  }),
+});
+
 export const tools = [
   executionGoalPlanner,
+  searchOnWeb,
   getFeedback,
   cliCommand,
-  codeAgentTool,
-  fileAgentTool,
+  ...fileTools,
+  ...codeTools
+  // codeAgentTool,
+  // fileAgentTool,
 ];
 
 export const toolsByName = Object.fromEntries(tools.map((tool) => [tool.name, tool]));

@@ -2,10 +2,11 @@ import chalk from "chalk";
 import inquirer from "inquirer";
 import { spawn } from "child_process";
 import os from "os";
+import readline from "readline";
 
 type RunCommandResult =
-  | { success: true; stdout: string }
-  | { success: false; error: string }
+  | { success: true; stdout: string; output: string }
+  | { success: false; error: string; output?: string }
   | { success: false; userComment: string };
 
 const DANGEROUS_COMMAND_PATTERNS = [
@@ -76,21 +77,61 @@ const runCliCommand = async ({ command }: { command: string }): Promise<RunComma
   }
 
   return new Promise((resolve) => {
-    const child = spawn(command, {
-      stdio: "inherit",
-      shell: true, 
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
     });
 
-    child.on("exit", (code) => {
+    let output = '';
+    
+    const child = spawn(command, {
+      shell: true,
+      stdio: ['pipe', 'pipe', 'pipe']
+    });
+
+    // Capture stdout
+    child.stdout?.on('data', (data) => {
+      const dataStr = data.toString();
+      process.stdout.write(dataStr);
+      output += dataStr;
+    });
+
+    // Capture stderr
+    child.stderr?.on('data', (data) => {
+      const dataStr = data.toString();
+      process.stderr.write(dataStr);
+      output += dataStr;
+    });
+
+    // Handle user input
+    rl.on('line', (input) => {
+      child.stdin?.write(input + '\n');
+    });
+
+    child.on('exit', (code) => {
+      rl.close();
       if (code === 0) {
-        resolve({ success: true, stdout: `Command "${command}" completed successfully.` });
+        resolve({ 
+          success: true, 
+          stdout: `Command "${command}" completed successfully.`,
+          output: output.trim() // Return the captured output
+        });
       } else {
-        resolve({ success: false, error: `Command exited with code ${code}` });
+        resolve({ 
+          success: false, 
+          error: `Command exited with code ${code}`,
+          output: output.trim() // Return the captured output even on error
+        });
       }
     });
 
-    child.on("error", (err) => {
-      resolve({ success: false, error: err.message });
+    child.on('error', (err) => {
+      rl.close();
+      resolve({ 
+        success: false, 
+        error: err.message,
+        output: output.trim() // Return any partial output if available
+      });
     });
   });
 };

@@ -59,7 +59,7 @@ export function getContext({
     };
   }
 
-  const metadataDir = path.resolve(process.cwd(), '.metadata');
+  const metadataDir = path.resolve(process.cwd(), './.codr/metadata');
   if (!fs.existsSync(metadataDir)) {
     return {
       success: false,

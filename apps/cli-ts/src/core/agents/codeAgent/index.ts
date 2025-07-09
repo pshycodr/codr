@@ -18,6 +18,7 @@ async function llmCodeAgent(state: typeof MessagesAnnotation.State) {
 
       Always utilize your tools smartly with smart and accurate inputs. 
       make sure when you are calling each tool, you are giving correct input.
+      ALWAYS make sure to provide the agent proper details context of the whole project, previous edits and current changes. 
 
       Your core responsibilities:
 

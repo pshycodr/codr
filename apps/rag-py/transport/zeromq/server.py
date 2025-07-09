@@ -14,6 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from transport.zeromq.codebase_rag_handler import codebase_rag_handler 
 from transport.zeromq.docs_rag_handler import docs_rag_handler 
+from transport.zeromq.agent_req_handler import agent_handler
 
 
 class ZeroMQServer:
@@ -59,7 +60,9 @@ class ZeroMQServer:
             self.clients[identity] = {}
 
             req_type = request.get('type')
-            if req_type == 'ping':
+            if req_type == 'agent':
+                response = agent_handler(request)
+            elif req_type == 'ping':
                 return self.send_to_client(identity, {"success": True, "msg": "pong"})
             elif req_type == 'check_collection':
                 exists = check_existing_collection(sanitize_collection_name(request.get('path')))

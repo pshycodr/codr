@@ -24,7 +24,7 @@ export function getFileContext({filePath}:{filePath: string}): FileContext | nul
   console.log(chalk.bgYellow.black("codeAgent/getFileContext Called"), filePath)
 
 
-  const filesMetaPath = path.resolve('.metadata/files.json');
+  const filesMetaPath = path.resolve('./.codr/metadata/files.json');
 
   if (!fs.existsSync(filesMetaPath)) {
     console.log(chalk.red("❌ files.json not found in .metadata."));

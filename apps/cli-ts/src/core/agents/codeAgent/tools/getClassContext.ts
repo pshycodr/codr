@@ -35,7 +35,7 @@ interface ClassContext {
 export function getClassContext({className}:{className: string}): ClassContext | null {
   console.log(chalk.bgYellow.black("codeAgent/getClassContext Called"), className)
 
-  const classesMetaPath = path.resolve('.metadata/classes.json');
+  const classesMetaPath = path.resolve('./.codr/metadata/classes.json');
 
   if (!fs.existsSync(classesMetaPath)) {
     console.log(chalk.red("❌ classes.json not found in .metadata."));

@@ -1,11 +1,11 @@
 import { parseCodebase } from "@codebase";
 import callRAG, { RagClient } from "@transport/zeromqClient";
-import generateCallGraph from "@utils/codebaseMetaData/callgraph";
-import generateClassMetadata from "@utils/codebaseMetaData/classMetadata";
-import { generateCssMetadata } from "@utils/codebaseMetaData/cssMetadata";
-import generateFileMetadata from "@utils/codebaseMetaData/filesMetadata";
-import generateFunctionMetadata from "@utils/codebaseMetaData/functionMeta";
-import { generateHtmlMetadata } from "@utils/codebaseMetaData/htmlMetadata";
+import generateCallGraph from "@core/context/codebaseMetaData/callgraph";
+import generateClassMetadata from "@core/context/codebaseMetaData/classMetadata";
+import { generateCssMetadata } from "@core/context/codebaseMetaData/cssMetadata";
+import generateFileMetadata from "@core/context/codebaseMetaData/filesMetadata";
+import generateFunctionMetadata from "@core/context/codebaseMetaData/functionMeta";
+import { generateHtmlMetadata } from "@core/context/codebaseMetaData/htmlMetadata";
 import chalk from "chalk";
 import fs from "fs";
 import path from "path";
@@ -27,7 +27,7 @@ interface QueryData {
   type: "codebase";
 }
 
-const metadataPath = path.resolve("./.metadata");
+const metadataPath = path.resolve("./.codr/metadata");
 const rag = new RagClient();
 const dirname = process.cwd();
 

@@ -2,6 +2,12 @@ import chalk from "chalk";
 import callRAG from "@transport/zeromqClient";
 import formatContext from "@utils/formatContext";
 
+import { config } from "dotenv";
+import path from "path";
+
+const envPath = path.resolve(__dirname, "../../.env");
+config({ path: envPath });
+
 interface QueryData {
     path: string;
     query: string;
@@ -13,9 +19,9 @@ export async function queryWebsite(data: QueryData): Promise<{ success: boolean;
         console.log(chalk.yellowBright("QueryWebsite Called\n"));
         const { success: ragSuccess, response: context } = await callRAG(data);
 
-        console.log(chalk.yellowBright("Context: "),  context);
+        // console.log(chalk.yellowBright("Context: "),  context);
         const formattedContext = formatContext(context.results);
-        console.log(chalk.yellowBright("formattedContext: "),  formattedContext);
+        // console.log(chalk.yellowBright("formattedContext: "),  formattedContext);
 
         if (!ragSuccess) {
             console.log(chalk.redBright("❌ Failed to retrieve context from RAG."));

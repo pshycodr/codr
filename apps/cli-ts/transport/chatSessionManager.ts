@@ -44,13 +44,13 @@ export class ChatSessionManager {
 
         // console.log(success, response, response.type);
         
-
+        
         if (!success || !response?.success) {
             console.error("❌ RAG call failed:", response?.error || error);
             throw new Error("RAG failed to return context");
         }
 
-        const formattedContext = formatContextForLLM(response.data.results, response.type);
+        const formattedContext = formatContextForLLM(response.data, response.type);
 
         const { decision } = await getCompletionFromOpenRouter({
             query: message,

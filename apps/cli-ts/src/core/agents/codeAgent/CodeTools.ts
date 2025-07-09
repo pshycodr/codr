@@ -37,8 +37,8 @@ const getContextTool = tool(getContext, {
   name: "get_context",
   description: "Retrieves metadata for a function, class, or file. Provides details like file path, start/end lines, parameters, return types, etc.",
   schema: z.object({
-    name: z.string(),
-    type: z.enum(["function", "class", "file"]).optional()
+    entityName: z.string(),
+    type: z.enum(["function", "class", "file", 'html', 'css'])
   })
 });
 
@@ -46,7 +46,7 @@ const getCallGraphTool = tool(getCallGraphContext, {
   name: "get_call_graph",
   description: "Returns the call graph of a given function including functions it calls and those that call it.",
   schema: z.object({
-    name: z.string()
+    fnName: z.string()
   })
 });
 
@@ -62,7 +62,7 @@ const getFunctionContextTool = tool(getFunctionContext, {
   name: "get_function_context",
   description: "Fetches metadata specifically for a function by name from the static metadata store.",
   schema: z.object({
-    name: z.string()
+    fnName: z.string()
   })
 });
 
@@ -70,7 +70,7 @@ const getClassContextTool = tool(getClassContext, {
   name: "get_class_context",
   description: "Fetches metadata specifically for a class by name from the static metadata store.",
   schema: z.object({
-    name: z.string()
+    className: z.string()
   })
 });
 

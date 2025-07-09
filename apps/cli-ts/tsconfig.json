@@ -35,6 +35,7 @@
       "@core/*": ["src/core/*"],
       "@cli/*": ["src/cli/*"],
       "@llm/*": ["src/llm/*"],
+      "@constants/*": ["constants/*"],
     }
   }
 }

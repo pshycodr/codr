@@ -26,7 +26,7 @@ interface QueryData {
 
 const Rag = new RagClient();
 
-const indexCodebase = async (data: QueryData) => {
+export async function indexCodebase (data: QueryData) {
     try {
         const { success, response } = await Rag.callRagOnce({ type: 'check_collection', path: data.path });
         console.log(response, success);
@@ -79,4 +79,4 @@ const indexCodebase = async (data: QueryData) => {
     }
 };
 
-export default indexCodebase;
+

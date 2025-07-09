@@ -35,7 +35,7 @@ export function getFunctionContext({fnName}:{fnName: string}): FunctionContext |
   console.log(chalk.bgYellow.black("codeAgent/getFunctionContext Called"), fnName)
 
 
-  const functionsMetaPath = path.resolve('.metadata/functions.json');
+  const functionsMetaPath = path.resolve('./.codr/metadata/functions.json');
 
   if (!fs.existsSync(functionsMetaPath)) {
     console.log(chalk.red("❌ functions.json not found in .metadata."));

@@ -1,37 +1,23 @@
 import { MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
-import { HumanMessage } from "@langchain/core/messages";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { llmWithTools, tools } from "./tools";
 import { fileTools } from "../fileAgent/fileTools";
 import { codeTools } from "../codeAgent/CodeTools";
+import { isSystemMessage } from "@langchain/core/messages";
 
 /**
  * Master LLM node: decides what to do based on the user prompt and available tools.
  */
+
 async function llmCall(state: typeof MessagesAnnotation.State) {
-  const result = await llmWithTools.invoke([
-    {
-      role: "system",
-      content: `
-      You are an expert Tool manager and task execustioner. Your primary goal is to fulfill user requests by Smartly Choosing what tool to use or What Agent to Call. You have access to the following tools:
-      Your Tools:
-      ${tools.map(t => `- ${t.name}: ${t.description}`).join("\n")}
+  const isFirstCall = state.messages.length <= 2; // system + user
 
-      File Agent's Tools:
-      ${fileTools.map(ft => `- ${ft.name}: ${ft.description}`).join("\n")}
+  const messagesToSend = isFirstCall
+    ? state.messages
+    : state.messages.filter(m => !isSystemMessage(m));
 
-      Code Agent Tools:
-      ${codeTools.map(ct => `- ${ct.name}: ${ct.description}`).join("\n")}
-      
-      ALWAYS REMEMBER : if you want user feedback use confirmAction tool.
-      Crucial Directives:
-      1. Allways Call the Agents with a proper detailed instruction and tools to use.
-      2. Allways try to use the tools you have smartly 
-   ` 
-    },
-    ...state.messages,
-  ]);
-
+  const result = await llmWithTools.invoke(messagesToSend);
   return { messages: [result] };
 }
 
@@ -43,6 +29,7 @@ function shouldContinue(state: typeof MessagesAnnotation.State) {
   // @ts-ignore
   return last?.tool_calls?.length ? "Action" : "__end__";
 }
+
 
 /**
  * LangGraph definition for Master Agent
@@ -57,15 +44,18 @@ const agentGraph = new StateGraph(MessagesAnnotation)
   })
   .addEdge("tools", "llmCall");
 
+
 const app = agentGraph.compile();
 
 /**
  * Entrypoint to invoke the Master Agent
  */
-export async function runMasterAgent(prompt: string) {
+export async function runMasterAgent({userPrompt, systemPrompt}:{userPrompt: string, systemPrompt: any }) {
+  // console.log(app.getGraph().drawMermaid());
+  
   const result = await app.invoke(
-    { messages: [new HumanMessage(prompt)] },
-    { recursionLimit: 100 }
+    { messages: [ new SystemMessage(systemPrompt), new HumanMessage(userPrompt)] },
+    { recursionLimit: 1000 }
   );
 
   const finalMessage = result.messages.at(-1);

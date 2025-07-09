@@ -33,7 +33,8 @@ def docs_rag_handler(request: dict) -> dict:
 
         try:
             results = retriever.invoke(query)
-            return { "results": [doc.page_content for doc in results] }
+            results = [doc.page_content for doc in results]
+            return {'success': True, 'type': request.get('type'), 'data': results }
         except Exception as e:
             return { "error": str(e) }
 
