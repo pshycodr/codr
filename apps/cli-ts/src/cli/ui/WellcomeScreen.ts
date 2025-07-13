@@ -15,7 +15,7 @@ export function printWelcomeScreen() {
 //  ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝     ╚═════╝╚══════╝╚═╝
 // `;
 */
-const banner = fs.readFileSync("A:/Projects/Ai-code-writer/apps/cli-ts/src/cli/ui/banner.txt", "utf-8");
+const banner = fs.readFileSync("apps/cli-ts/src/cli/ui/banner.txt", "utf-8");
 
   const line = chalk.gray("────────────────────────────────────────────────────────────");
 
