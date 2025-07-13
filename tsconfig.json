@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    // Environment setup & latest features
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "allowJs": true,
+
+    // Bundler mode
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+
+    // Best practices
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    // Some stricter flags (disabled by default)
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "baseUrl": "./apps",
+    "paths": {
+      "@codebase": ["codebase/index.ts"],
+      "@utils/*": ["cli-ts/utils/*"],
+      "@transport/*": ["cli-ts/transport/*"],
+      "@nodes/*": ["nodes/*"],
+      "@core/*": ["cli-ts/src/core/*"],
+      "@cli/*": ["cli-ts/src/cli/*"],
+      "@llm/*": ["cli-ts/src/llm/*"],
+      "@constants/*": ["cli-ts/constants/*"],
+    }
+  }
+}

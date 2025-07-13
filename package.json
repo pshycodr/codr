@@ -1,0 +1,55 @@
+{
+  "name": "ai-code-writer",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run ./apps/cli-ts/src/index.ts"
+  },
+  "bin": {
+    "codr": "./apps/cli-ts/src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/cheerio": "^1.0.0",
+    "@types/node": "^24.0.1",
+    "chalk": "^5.4.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@google/genai": "^1.7.0",
+    "@inkjs/ui": "^2.0.0",
+    "@langchain/community": "^0.3.48",
+    "@langchain/core": "^0.3.62",
+    "@langchain/google-genai": "^0.2.10",
+    "@langchain/langgraph": "^0.3.0",
+    "@langchain/openai": "^0.5.15",
+    "@types/blessed": "^0.1.25",
+    "@types/postcss-safe-parser": "^5.0.4",
+    "blessed": "^0.1.81",
+    "boxen": "^8.0.1",
+    "cheerio": "^1.1.0",
+    "commander": "^14.0.0",
+    "dotenv": "^16.5.0",
+    "figlet": "^1.8.2",
+    "gradient-string": "^3.0.0",
+    "i": "^0.3.7",
+    "ink": "^6.0.1",
+    "ink-text-input": "^6.0.0",
+    "inquirer": "^12.6.3",
+    "langchain": "^0.3.27",
+    "npm": "^11.4.2",
+    "openai": "^5.3.0",
+    "ora": "^8.2.0",
+    "p-limit": "^6.2.0",
+    "postcss": "^8.5.6",
+    "postcss-safe-parser": "^7.0.1",
+    "react": "^19.1.0",
+    "ts-morph": "^26.0.0",
+    "winston": "^3.17.0",
+    "zeromq": "^6.4.2",
+    "zod": "^3.25.56"
+  }
+}

@@ -5,6 +5,7 @@ import { llmWithTools, tools } from "./tools";
 import { fileTools } from "../fileAgent/fileTools";
 import { codeTools } from "../codeAgent/CodeTools";
 import { isSystemMessage } from "@langchain/core/messages";
+import { chatInputNode } from "./cliInputChat";
 
 /**
  * Master LLM node: decides what to do based on the user prompt and available tools.
@@ -35,26 +36,28 @@ function shouldContinue(state: typeof MessagesAnnotation.State) {
  * LangGraph definition for Master Agent
  */
 const agentGraph = new StateGraph(MessagesAnnotation)
+  .addNode("chatInput", chatInputNode)
   .addNode("llmCall", llmCall)
   .addNode("tools", new ToolNode(tools))
-  .addEdge("__start__", "llmCall")
+  
+  .addEdge("__start__", "chatInput")
+  .addEdge("chatInput", "llmCall")
   .addConditionalEdges("llmCall", shouldContinue, {
     Action: "tools",
-    __end__: "__end__",
+    __end__: "chatInput", // This loops back to show output and get new input
   })
   .addEdge("tools", "llmCall");
-
-
+  
 const app = agentGraph.compile();
 
 /**
  * Entrypoint to invoke the Master Agent
  */
-export async function runMasterAgent({userPrompt, systemPrompt}:{userPrompt: string, systemPrompt: any }) {
+export async function runMasterAgent({ userPrompt, systemPrompt }: { userPrompt: string, systemPrompt: any }) {
   // console.log(app.getGraph().drawMermaid());
-  
+
   const result = await app.invoke(
-    { messages: [ new SystemMessage(systemPrompt), new HumanMessage(userPrompt)] },
+    { messages: [new SystemMessage(systemPrompt), new HumanMessage(userPrompt)] },
     { recursionLimit: 1000 }
   );
 

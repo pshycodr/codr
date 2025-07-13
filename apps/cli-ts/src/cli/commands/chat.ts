@@ -3,6 +3,7 @@ import { RagClient} from "@transport/zeromqClient"
 import { startChatUI } from "@cli/ui/chatUI";
 import { ChatSessionManager } from "@transport/chatSessionManager";
 import { message } from "blessed";
+import { startChatUI2 } from "@cli/ui/chatUI2";
 
 interface CallRAG {
     path: string;
@@ -26,6 +27,6 @@ export const chatWithContext = async (data: CallRAG) => {
 
     const firstReply = "No initial response";
 
-    await startChatUI(session_id, query, decision, chatManager);
+    await startChatUI2(session_id, query, decision, chatManager);
 
 }

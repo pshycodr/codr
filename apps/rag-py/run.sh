@@ -1,1 +1,0 @@
-uv run ./transport/zeromq/server.py

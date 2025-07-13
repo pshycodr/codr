@@ -1,9 +1,7 @@
-import { runCodeAgent } from "@core/agents/codeAgent";
-import { runFileAgent } from "@core/agents/fileAgent";
+
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import runCommand from "./tools/runCliCommand";
-import { makeToolCallingDecision } from "./tools/makeToolCallingDecision";
 import { llm } from "@llm/gemini";
 import { confirmAction } from "./tools/confirmAction";
 import goalPlanner from "./tools/goalPlanner";
@@ -19,22 +17,6 @@ const cliCommand = tool(runCommand, {
   }),
 });
 
-
-const codeAgentTool = tool(runCodeAgent, {
-  name: "code_agent",
-  description: "Handles code-related tasks: editing functions, refactoring code, generating new modules or logic",
-  schema: z.object({
-    prompt: z.string().describe("A code-related instruction, request, or intent from the user"),
-  }),
-});
-
-const fileAgentTool = tool(runFileAgent, {
-  name: "file_agent",
-  description: "Handles file system operations: creating files/folders, reading/writing content, searching paths",
-  schema: z.object({
-    prompt: z.string().describe("A file or folder related instruction, such as 'create index.ts in src'"),
-  }),
-});
 
 const getFeedback = tool(confirmAction, {
   name: "get_user_feaeback",
@@ -56,7 +38,7 @@ const searchOnWeb = tool(webSearch, {
   name: "web_search",
   description: "Searches the web for up-to-date information relevant to a user query. Useful when additional context, tutorials, latest documentation, or troubleshooting solutions are needed.",
   schema: z.object({
-    query: z.string().describe("The natural language search string the user would type into a search engine, such as 'How to set up Tailwind with Vite in React' or 'Best way to handle file uploads in Next.js'.")
+    query: z.string().describe("The natural language proper descriptive search string the user would type into a search engine.")
   }),
 });
 
