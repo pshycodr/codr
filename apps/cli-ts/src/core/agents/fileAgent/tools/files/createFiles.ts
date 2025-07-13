@@ -1,3 +1,4 @@
+import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
 import chalk from 'chalk';
 import fs from 'fs/promises';
 import path from 'path';
@@ -11,9 +12,7 @@ type CreateFilesInput = {
 const createFiles = async ({ folder, files }: CreateFilesInput) => {
   try {
 
-    console.log(chalk.bgGreen.black("createFile Called"))
-    console.log("Folder and Files: ", folder, files);
-
+    startLoader(`Creating files in :${folder} \n files: ${files.map(file => `${file}` ).join('\n')} `)
 
 
     for (const file of files) {
@@ -21,6 +20,8 @@ const createFiles = async ({ folder, files }: CreateFilesInput) => {
       await fs.writeFile(filePath, '', { flag: 'w' });
       console.log(`📝 Created: ${filePath}`);
     }
+
+    stopLoader(`✓ Files Created Successfully`)
 
     return { success: true, };
   } catch (error: any) {

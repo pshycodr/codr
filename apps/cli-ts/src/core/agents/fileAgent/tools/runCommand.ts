@@ -44,7 +44,7 @@ const runCliCommand = async ({ command }: { command: string }): Promise<RunComma
   console.log(chalk.cyan("🔹 Command Received:"), chalk.yellow(command));
 
   const shell = detectShell();
-  console.log(chalk.magentaBright(`💻 Detected Shell:`), chalk.white(shell));
+  console.log(chalk.magentaBright(`Detected Shell:`), chalk.white(shell));
 
   if (isDangerous(command)) {
     console.log(chalk.bgRed.white("⚠️  Warning: This command may be dangerous."));

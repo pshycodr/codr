@@ -1,11 +1,11 @@
 import chalk from 'chalk';
 import fs from 'fs/promises';
 import { resolvePath } from "@utils/resolvePath"
+import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
 
 
 const readFile = async ({ fileName }: { fileName: string }) => {
-    console.log(chalk.bgGreen.black("readFile Called"));
-    console.log("📄 File Requested:", fileName);
+    startLoader(`Reading file: ${fileName}`)
 
     // Resolve relative path based on current working directory
     const fullPath = resolvePath(fileName)
@@ -17,7 +17,7 @@ const readFile = async ({ fileName }: { fileName: string }) => {
         if (!res.trim()) {
             console.log(chalk.yellow.black("⚠️ The file is empty."));
         }
-
+        stopLoader(`✓ File read successfully`)
         return { success: true, content: res };
     } catch (error: any) {
         if (error.code === "ENOENT") {

@@ -6,24 +6,15 @@ import chalk from "chalk";
 import { fileTools } from "@core/agents/fileAgent/fileTools";
 import { codeTools } from "@core/agents/codeAgent/CodeTools";
 import { tools } from "../tools";
+import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
 
 // Collect and assert non-empty tool list
 const allTools = [
   ...fileTools.map(t => t.name),
   ...codeTools.map(t => t.name),
-  // ...tools.filter(t => t.name !== "execution_goal_planner").map(t => t.name),
 ] as [string, ...string[]];
 
-// //  Actions allowed
-// const allowedActions = [
-//   "runCommand",
-//   "writeFile",
-//   "createFile",
-//   "installPackage",
-//   "generateComponent"
-// ] as const;
 
-//  Define schema based on prompt structure
 const planSchema = z.array(
   z.object({
     step: z.string(),
@@ -32,11 +23,10 @@ const planSchema = z.array(
   })
 );
 
-// ✅ Output parser
 const parser = StructuredOutputParser.fromZodSchema(planSchema);
 const instructions = parser.getFormatInstructions().replace(/}/g, "}}").replace(/{/g, "{{");
 
-// ✅ Prompt template
+// Prompt template
 const prompt = PromptTemplate.fromTemplate(`
 You are an expert AI software architect and project planner.
 
@@ -80,7 +70,8 @@ ${instructions}
 `);
 
 export default async function goalPlanner({ goal }: { goal: string }) {
-  console.log(chalk.bgYellow.black("goalPlanner Called:"), goal);
+
+  startLoader(`Planning for: ${goal}`)
 
   const model = new ChatGoogleGenerativeAI({
     model: "gemini-2.5-flash",
@@ -93,7 +84,7 @@ export default async function goalPlanner({ goal }: { goal: string }) {
 
   try {
     const result = await chain.invoke({ goal });
-    console.log(chalk.bgBlue.black("Execution plan:"), result);
+    stopLoader(`✓ Planning complete`)
     return JSON.stringify(result);
   } catch (err) {
     console.error("❌ Failed to generate plan:", err);

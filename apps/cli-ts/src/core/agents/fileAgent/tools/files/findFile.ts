@@ -1,3 +1,4 @@
+import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
 import chalk from "chalk";
 import fs from "fs/promises";
 import path from "path";
@@ -6,8 +7,7 @@ const findFile = async ({ fileName }: { fileName: string }) => {
   const root = process.cwd(); // Project root
   const result: string[] = [];
 
-  console.log(chalk.bgGreen.black("findFile Called"))
-  console.log("File Name Received:", fileName);
+  startLoader(`Searching for file : ${fileName}`)
 
   async function searchDirectory(currentPath: string) {
     const entries = await fs.readdir(currentPath, { withFileTypes: true });
@@ -31,7 +31,7 @@ const findFile = async ({ fileName }: { fileName: string }) => {
     if (result.length === 0) {
       return { success: false, message: `❌ File "${fileName}" not found in project.` };
     }
-
+    stopLoader(`✓ File found at: ${result.map(path => `${path}`).join('\n') }`)
     return {
       success: true,
       matches: result, // may be multiple

@@ -1,14 +1,14 @@
+import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
 import chalk from 'chalk';
 import { mkdir } from 'fs/promises';
 
 const createFolder = async ({ path }: { path: string }) => {
   try {
 
-    console.log(chalk.bgGreen.black("createFolder Called"))
-    console.log("path: ", path);
+    startLoader(`Creating Folder at : ${path}`)
 
     await mkdir(path, { recursive: true });
-    console.log(`✅ Folder ensured at: ${path}`);
+    stopLoader('✓ Folder Created Successfully');
     return { success: true };
   } catch (error) {
     console.error(`❌ Failed to create folder "${path}":`, error);
