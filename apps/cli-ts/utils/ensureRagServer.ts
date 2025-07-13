@@ -1,5 +1,8 @@
 import { spawn } from "child_process";
 import { RagClient } from "@transport/zeromqClient";
+import { join } from "path";
+
+const projectRoot = join(__dirname, "..", "..", "..")
 
 function startRagServerInBackground() {
     const subprocess = spawn("uv run -m apps.rag_py.transport.zeromq.server", {
@@ -7,7 +10,7 @@ function startRagServerInBackground() {
         detached: true,
         stdio: "ignore",
         windowsHide: true,
-        cwd: process.cwd(),
+        cwd: projectRoot,
     });
 
     subprocess.unref();
