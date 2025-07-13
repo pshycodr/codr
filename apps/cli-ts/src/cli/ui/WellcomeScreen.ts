@@ -1,12 +1,13 @@
 
 import chalk from "chalk";
 import fs from "fs"
+import path from "path";
 
 export function printWelcomeScreen() {
   console.clear();
 
-
-const banner = fs.readFileSync("apps/cli-ts/src/cli/ui/banner.txt", "utf-8");
+  const bannerPath = path.resolve(__dirname, "./banner.txt"); 
+  const banner = fs.readFileSync(bannerPath, "utf-8");
 
   const line = chalk.gray("────────────────────────────────────────────────────────────");
 
