@@ -10,7 +10,7 @@ import { ensureRagServerRunning } from "@utils/ensureRagServer";
 // Get project root from current file location
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const envPath = path.resolve(__dirname, "../../.env");  // adjust if needed
+const envPath = path.resolve(__dirname, ".env");  // adjust if needed
 
 if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath });
