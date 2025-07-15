@@ -6,15 +6,11 @@ import { config } from "dotenv";
 import path from "path";
 import chalk from 'chalk';
 import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
+import { llm } from '@llm/llm';
 
 
 const envPath = path.resolve(__dirname, "../../.env");
 config({ path: envPath });
-
-const llm = new ChatGoogleGenerativeAI({
-    model: "gemini-2.0-flash-lite",
-    apiKey: process.env.GEMINI_API_KEY
-});
 
 
 export async function webSearch({ query }: { query: string }) {

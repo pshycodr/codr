@@ -1,6 +1,6 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import { llm } from "@llm/gemini";
+import { llm } from "@llm/llm";
 
 import { deleteCodeAtLines } from "./tools/deleteCode";
 import { editFileAtLine } from "./tools/editCode";

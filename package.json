@@ -1,13 +1,16 @@
 {
-  "name": "ai-code-writer",
+  "name": "@pshycodr/codr",
+  "version": "1.0.0",
   "module": "index.ts",
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run ./apps/cli-ts/src/index.ts"
+    "dev": "bun run ./apps/cli-ts/src/index.ts",
+    "build": "bun build ./apps/cli-ts/src/index.ts --outdir dist --target bun",
+    "prepare": "bun run build"
   },
   "bin": {
-    "codr": "./apps/cli-ts/src/index.ts"
+    "codr": "./dist/index.js"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -21,8 +24,10 @@
   "dependencies": {
     "@google/genai": "^1.7.0",
     "@inkjs/ui": "^2.0.0",
+    "@langchain/anthropic": "^0.3.24",
     "@langchain/community": "^0.3.48",
     "@langchain/core": "^0.3.62",
+    "@langchain/deepseek": "^0.0.2",
     "@langchain/google-genai": "^0.2.10",
     "@langchain/langgraph": "^0.3.0",
     "@langchain/openai": "^0.5.15",
@@ -47,9 +52,13 @@
     "postcss": "^8.5.6",
     "postcss-safe-parser": "^7.0.1",
     "react": "^19.1.0",
+    "react-devtools-core": "^6.1.5",
     "ts-morph": "^26.0.0",
     "winston": "^3.17.0",
     "zeromq": "^6.4.2",
     "zod": "^3.25.56"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
   }
 }

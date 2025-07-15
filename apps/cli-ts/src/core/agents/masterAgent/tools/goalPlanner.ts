@@ -7,6 +7,7 @@ import { fileTools } from "@core/agents/fileAgent/fileTools";
 import { codeTools } from "@core/agents/codeAgent/CodeTools";
 import { tools } from "../tools";
 import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
+import { llm } from "@llm/llm";
 
 // Collect and assert non-empty tool list
 const allTools = [
@@ -73,14 +74,8 @@ export default async function goalPlanner({ goal }: { goal: string }) {
 
   startLoader(`Planning for: ${goal}`)
 
-  const model = new ChatGoogleGenerativeAI({
-    model: "gemini-2.5-flash",
-    temperature: 0.3,
-    apiKey: process.env.GEMINI_API_KEY,
-    json : true
-  });
 
-  const chain = prompt.pipe(model).pipe(parser);
+  const chain = prompt.pipe(llm).pipe(parser);
 
   try {
     const result = await chain.invoke({ goal });

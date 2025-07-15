@@ -2,7 +2,7 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import runCommand from "./tools/runCliCommand";
-import { llm } from "@llm/gemini";
+import { llm } from "@llm/llm";
 import { confirmAction } from "./tools/confirmAction";
 import goalPlanner from "./tools/goalPlanner";
 import { fileTools } from "../fileAgent/fileTools";
