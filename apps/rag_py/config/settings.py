@@ -1,6 +1,5 @@
 from pydantic_settings import BaseSettings
 
-
 class Settings(BaseSettings):
     CHUNK_SIZE: int = 512
     CHUNK_OVERLAP: int = 128
@@ -12,7 +11,9 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL: str = "thenlper/gte-small"
     EMBEDDING_DEVICE: str = "cpu"
 
-    class Config:
-        env_file = ".env"
+    model_config = {
+        "extra": "ignore",
+        "env_file": ".env"
+    }
 
 settings = Settings()
