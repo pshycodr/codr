@@ -23,6 +23,11 @@ if (fs.existsSync(envPath)) {
 if (process.argv.length <= 2) {
   const { printWelcomeScreen } = await import("./ui/WellcomeScreen");
   printWelcomeScreen();
+ 
+  const { runMasterAgent } = await import("@core/agents/masterAgent/masterAgent");
+  const { CONVERSATION_SYSTEM_PROMPT } = await import("@constants/masternode");
+  const msg = "Hello!!"
+  await runMasterAgent({ systemPrompt: CONVERSATION_SYSTEM_PROMPT, userPrompt: msg });
   process.exit(0);
 }
 
@@ -42,10 +47,6 @@ program
 program
   .argument("<prompt...>")
   .action(async (prompt) => {
-    const ok = await ensureRagServerRunning()
-    if (!ok) {
-      return process.exit(1);
-    }
     const { runMasterAgent } = await import("@core/agents/masterAgent/masterAgent");
     const { CONVERSATION_SYSTEM_PROMPT } = await import("@constants/masternode");
     const msg = prompt.join(" ");
@@ -56,10 +57,6 @@ program
 program
   .command("init")
   .action(async () => {
-    const ok = await ensureRagServerRunning()
-    if (!ok) {
-      return process.exit(1);
-    }
     const { runMasterAgent } = await import("@core/agents/masterAgent/masterAgent");
     const { INIT_SYSTEM_PROMPT } = await import("@constants/masternode");
     await runMasterAgent({ userPrompt: "Do What ever the System Prompt Says", systemPrompt: INIT_SYSTEM_PROMPT });
@@ -70,10 +67,6 @@ program
   .command("create")
   .argument("<prompt>")
   .action(async (prompt) => {
-    const ok = await ensureRagServerRunning()
-    if (!ok) {
-      return process.exit(1);
-    }
     const { runMasterAgent } = await import("@core/agents/masterAgent/masterAgent");
     const { CREATE_SYSTEM_PROMPT } = await import("@constants/masternode");
     await runMasterAgent({ userPrompt: prompt, systemPrompt: CREATE_SYSTEM_PROMPT });
@@ -87,10 +80,6 @@ program
   .requiredOption("-q, --query <query>")
   .option("--chat", "Open persistent chat UI")
   .action(async (opts) => {
-    const ok = await ensureRagServerRunning()
-    if (!ok) {
-      return process.exit(1);
-    }
     if (opts.chat) {
       const { chatWithContext } = await import("./commands/chat");
       await chatWithContext({ path: opts.path, query: opts.query, type: "doc" });
@@ -108,10 +97,6 @@ program
   .requiredOption("-q, --query <query>")
   .option("--chat", "Open persistent chat UI")
   .action(async (opts) => {
-    const ok = await ensureRagServerRunning()
-    if (!ok) {
-      return process.exit(1);
-    }
     if (opts.chat) {
       const { chatWithContext } = await import("./commands/chat");
       await chatWithContext({ path: opts.path, query: opts.query, type: "webpage" });

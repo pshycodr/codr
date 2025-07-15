@@ -6,6 +6,7 @@ import zmq from 'zeromq';
 import formatContext from '../utils/formatContext';
 import { getCompletionFromOpenRouter } from '../utils/AI/ragAnswerAI';
 import { getSummarizeChat } from '../utils/AI/chatSummarizer';
+import { ensureRagServerRunning } from '@utils/ensureRagServer';
 
 interface CallRAG {
     path?: string;
@@ -17,6 +18,11 @@ interface CallRAG {
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const callRAG = async (data: CallRAG) => {
+
+    const ok = await ensureRagServerRunning()
+    if (!ok) {
+        return process.exit(1);
+    }
 
     const socket = new zmq.Request();
 
@@ -60,6 +66,10 @@ export class RagClient {
     }
 
     async callRagOnce(payload: any) {
+        const ok = await ensureRagServerRunning()
+        if (!ok) {
+            return process.exit(1);
+        }
         const socket = new zmq.Request();
 
         try {
@@ -84,14 +94,14 @@ export class RagClient {
     }
 }
 
-    // void (async () => {
-    //     const { success, decision: newSummary } = await getSummarizeChat({
-    //         chat: currentChat,
-    //         prevSummary: previousSummary
-    //     });
+// void (async () => {
+//     const { success, decision: newSummary } = await getSummarizeChat({
+//         chat: currentChat,
+//         prevSummary: previousSummary
+//     });
 
-    //     if (success && newSummary) {
-    //         previousSummary = newSummary;
-    //         console.log("📝 Chat Summary Updated.");
-    //     }
-    // })();
+//     if (success && newSummary) {
+//         previousSummary = newSummary;
+//         console.log("📝 Chat Summary Updated.");
+//     }
+// })();
