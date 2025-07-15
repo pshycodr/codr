@@ -7,6 +7,7 @@ import path from "path";
 import chalk from 'chalk';
 import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
 import { llm } from '@llm/llm';
+import { ensureRagServerRunning } from '@utils/ensureRagServer';
 
 
 const envPath = path.resolve(__dirname, "../../.env");
@@ -32,6 +33,12 @@ export async function webSearch({ query }: { query: string }) {
         query,
         type: 'agent'
     }
+
+    const ok = await ensureRagServerRunning()
+    if (!ok) {
+        return process.exit(1);
+    }
+
 
     const rag = new RagClient()
 

@@ -19,11 +19,6 @@ const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const callRAG = async (data: CallRAG) => {
 
-    const ok = await ensureRagServerRunning()
-    if (!ok) {
-        return process.exit(1);
-    }
-
     const socket = new zmq.Request();
 
     try {
@@ -66,10 +61,7 @@ export class RagClient {
     }
 
     async callRagOnce(payload: any) {
-        const ok = await ensureRagServerRunning()
-        if (!ok) {
-            return process.exit(1);
-        }
+       
         const socket = new zmq.Request();
 
         try {

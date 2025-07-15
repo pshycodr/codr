@@ -10,7 +10,7 @@ import { ensureRagServerRunning } from "@utils/ensureRagServer";
 // Get project root from current file location
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const envPath = path.resolve(__dirname, ".env");  // adjust if needed
+const envPath = path.resolve(__dirname, ".env");  
 
 if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath });
@@ -80,6 +80,11 @@ program
   .requiredOption("-q, --query <query>")
   .option("--chat", "Open persistent chat UI")
   .action(async (opts) => {
+    const ok = await ensureRagServerRunning()
+    if (!ok) {
+        return process.exit(1);
+    }
+
     if (opts.chat) {
       const { chatWithContext } = await import("./commands/chat");
       await chatWithContext({ path: opts.path, query: opts.query, type: "doc" });
@@ -97,6 +102,11 @@ program
   .requiredOption("-q, --query <query>")
   .option("--chat", "Open persistent chat UI")
   .action(async (opts) => {
+    const ok = await ensureRagServerRunning()
+    if (!ok) {
+        return process.exit(1);
+    }
+
     if (opts.chat) {
       const { chatWithContext } = await import("./commands/chat");
       await chatWithContext({ path: opts.path, query: opts.query, type: "webpage" });
