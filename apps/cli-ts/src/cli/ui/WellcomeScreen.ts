@@ -1,13 +1,22 @@
-
 import chalk from "chalk";
-import fs from "fs"
-import path from "path";
 
 export function printWelcomeScreen() {
   console.clear();
 
-  const bannerPath = path.resolve(__dirname, "./banner.txt"); 
-  const banner = fs.readFileSync(bannerPath, "utf-8");
+  const banner = `
+      .-.                                   .-.      
+     / \\_\\                                 /_/ \\     
+    /  / /                                 \\ \\  \\     
+   /  / /  ██████╗ ██████╗ ██████╗ ██████╗  \\ \\  \\    
+  /  / /  ██╔════╝██╔═══██╗██╔══██╗██╔══██╗  \\ \\  \\   
+ /  / /   ██║     ██║   ██║██║  ██║██████╔╝   \\ \\  \\  
+'  <-<    ██║     ██║   ██║██║  ██║██╔══██╗    >->  ' 
+ \\  \\ \\   ╚██████╗╚██████╔╝██████╔╝██║  ██║   / /  /  
+  \\  \\ \\   ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝  / /  /   
+   \\  \\_\\                                   /_/  /    
+    \\ / /                                   \\ \\ /     
+     '-'                                     \`-\`      
+  `;
 
   const line = chalk.gray("────────────────────────────────────────────────────────────");
 
