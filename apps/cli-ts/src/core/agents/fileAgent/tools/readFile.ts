@@ -19,19 +19,12 @@ const readFile = async ({ fileName }: { fileName: string }) => {
 			content = result.value;
 		} else if (ext === ".pdf") {
 			const dataBuffer = fsSync.readFileSync(fullPath);
-
 			const { default: pdfParse } = await import("pdf-parse");
-
 			const data = await pdfParse(dataBuffer);
 			content = data.text;
-		} else if (ext === ".md" || ext === ".txt") {
-			content = await fs.readFile(fullPath, "utf8");
 		} else {
-			stopLoader(`⚠️ Unsupported file type: ${ext}`);
-			return {
-				success: false,
-				error: `Unsupported file type: ${ext}. Supported types are .docx, .pdf, .md, and .txt.`,
-			};
+			// Default behavior for code/text files
+			content = await fs.readFile(fullPath, "utf-8");
 		}
 
 		if (!content.trim()) {
