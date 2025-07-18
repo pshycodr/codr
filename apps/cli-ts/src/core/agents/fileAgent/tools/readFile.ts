@@ -20,7 +20,6 @@ const readFile = async ({ fileName }: { fileName: string }) => {
 		} else if (ext === ".pdf") {
 			const dataBuffer = fsSync.readFileSync(fullPath); // must use sync for buffer
 
-			// 👇 Lazy import avoids running test logic
 			const { default: pdfParse } = await import("pdf-parse");
 
 			const data = await pdfParse(dataBuffer);
