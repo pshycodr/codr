@@ -9,67 +9,64 @@ import readFile from "./tools/readFile";
 import writeFile from "./tools/writeFile";
 import findFile from "./tools/findFile";
 
-// CLI and tool routing
-
 /**
  * Tool: Create a new folder at a specified path.
  */
 const makeFolder = tool(createFolder, {
   name: "create_folder",
-  description: "Creates a new folder at the given path",
+  description: "Creates a new directory at the given path, including any intermediate folders if necessary.",
   schema: z.object({
-    path: z.string(),
+    path: z.string().describe("The absolute or relative folder path to be created (e.g., './src/components')"),
   }),
 });
 
 /**
- * Tool: Create multiple empty files inside a specified folder.
+ * Tool: Create one or more files inside a specified folder.
  */
 const makeFiles = tool(createFiles, {
   name: "make_files",
-  description: "Creates empty files in a specified folder",
+  description: "Creates multiple empty files inside a given folder. Useful for scaffolding or bootstrapping file structures.",
   schema: z.object({
-    folder: z.string(),
-    files: z.array(z.string()),
+    folder: z.string().describe("The folder in which to create the files"),
+    files: z.array(z.string()).describe("List of file names to create inside the folder (e.g., ['index.ts', 'utils.ts'])"),
   }),
 });
 
 /**
- * Tool: Read the content of a file.
+ * Tool: Read the contents of a supported file (.txt, .md, .pdf, .docx).
  */
 const readFiles = tool(readFile, {
   name: "read_file",
-  description: "Reads the contents of a file",
+  description: "Reads the content of a file. Supports plain text, markdown, PDF, and Word documents.",
   schema: z.object({
-    fileName: z.string(),
+    fileName: z.string().describe("Path to the file to read, relative to the project root or absolute."),
   }),
 });
 
 /**
- * Tool: Write content to a file (overwrite or append).
+ * Tool: Write or overwrite text into a file.
  */
 const writeFiles = tool(writeFile, {
   name: "write_file",
-  description: "Writes text data to a file",
+  description: "Writes text content into a file. If the file exists, it will be overwritten.",
   schema: z.object({
-    fileName: z.string(),
-    data: z.string(),
+    fileName: z.string().describe("The file path where content should be written"),
+    data: z.string().describe("The actual string content to write into the file"),
   }),
 });
 
 /**
- * Tool: Search for a file by name within the project directory (recursive).
+ * Tool: Search for a file by name within the entire project directory.
  */
 const searchFile = tool(findFile, {
   name: "find_file",
-  description: "Recursively searches for a file by name within the project folder",
+  description: "Searches for a file by name recursively from the project root directory. Useful when the exact path is unknown.",
   schema: z.object({
-    fileName: z.string(),
+    fileName: z.string().describe("Name of the file to search for (e.g., 'app.tsx' or 'README.md')"),
   }),
 });
 
-
-// Export all tools as an array for LangGraph or planner consumption
+// Export all tools as an array for LangGraph or planner usage
 export const fileTools = [
   makeFolder,
   makeFiles,
@@ -78,10 +75,10 @@ export const fileTools = [
   searchFile,
 ];
 
-// Named tool map (used by LangGraph executors, routers, or fallback logic)
+// Named tool map (used by LangGraph, routers, or fallback logic)
 export const toolsByName = Object.fromEntries(
   fileTools.map((tool) => [tool.name, tool])
 );
 
-// Bind all tools to the LLM so it can call them autonomously
+// Bind to LLM for autonomous tool invocation
 export const llmWithFileTools = llm.bindTools(fileTools);
