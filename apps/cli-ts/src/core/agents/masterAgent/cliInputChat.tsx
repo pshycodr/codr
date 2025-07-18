@@ -17,8 +17,19 @@ export async function chatInputNode(state: any) {
 	// Show last assistant response if exists
 	if (state.messages?.length > 2) {
 		const lastMessage = state.messages[state.messages.length - 1];
+
 		if (lastMessage._getType() === "ai") {
-			console.log(`\n${assistantPrefix} ${lastMessage.content}\n`);
+			let content = lastMessage.content;
+
+			if (typeof content !== "string") {
+				try {
+					content = JSON.stringify(content, null, 2);
+				} catch {
+					content = String(content);
+				}
+			}
+
+			console.log(`\n${assistantPrefix} ${content}\n`);
 		}
 	}
 

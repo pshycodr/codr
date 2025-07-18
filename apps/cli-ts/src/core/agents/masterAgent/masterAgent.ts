@@ -11,7 +11,6 @@ import { llmWithTools, tools } from "./tools";
 /**
  * Master LLM node: decides what to do based on the user prompt and available tools.
  */
-
 async function llmCall(state: typeof MessagesAnnotation.State) {
 	const isFirstCall = state.messages.length <= 2; // system + user
 
@@ -60,8 +59,6 @@ export async function runMasterAgent({
 	userPrompt: string;
 	systemPrompt: any;
 }) {
-	// console.log(app.getGraph().drawMermaid());
-
 	const result = await app.invoke(
 		{
 			messages: [new SystemMessage(systemPrompt), new HumanMessage(userPrompt)],
@@ -70,7 +67,25 @@ export async function runMasterAgent({
 	);
 
 	const finalMessage = result.messages.at(-1);
-	const content = finalMessage?.content ?? "[No output from agent]";
+
+	let content: string;
+
+	if (!finalMessage || !finalMessage.content) {
+		content = "[No output from agent]";
+	} else if (typeof finalMessage.content === "string") {
+		content = finalMessage.content;
+	} else if (Array.isArray(finalMessage.content)) {
+		content = finalMessage.content
+			.map((item) =>
+				typeof item === "string" ? item : JSON.stringify(item, null, 2),
+			)
+			.join("\n\n");
+	} else if (typeof finalMessage.content === "object") {
+		content = JSON.stringify(finalMessage.content, null, 2);
+	} else {
+		content = String(finalMessage.content);
+	}
+
 	console.log(content);
 	return content;
 }
