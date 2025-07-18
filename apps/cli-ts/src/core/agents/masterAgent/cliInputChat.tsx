@@ -7,6 +7,7 @@ const userPrefix = chalk.bold.blue("> You:");
 const assistantPrefix = chalk.bold.green("> Assistant:");
 const promptSymbol = chalk.gray("›");
 const exitNotice = chalk.dim('(Type "exit" to quit)');
+const emptyInputMessage = chalk.yellow("Please enter a message to continue...");
 
 export async function chatInputNode(state: any) {
 	const rl = readline.createInterface({
@@ -39,17 +40,23 @@ export async function chatInputNode(state: any) {
 			? `${promptSymbol} Continue? ${exitNotice}\n${promptSymbol} `
 			: `${promptSymbol} Your request ${exitNotice}\n${promptSymbol} `;
 
-	return new Promise<{ messages: any[] }>((resolve) => {
+	function promptUser() {
 		rl.question(promptLine, (answer) => {
-			rl.close();
+			if (answer.trim() === "") {
+				console.log(emptyInputMessage);
+				promptUser(); // Prompt again
+				return;
+			}
 
 			if (answer.toLowerCase() === "exit") {
 				console.log(chalk.dim("\nSession ended\n"));
+				rl.close();
 				process.exit(0);
 			}
 
 			// Echo user input cleanly
 			console.log(`${userPrefix} ${answer}`);
+			rl.close();
 
 			const newMessages = state.messages
 				? [...state.messages, new HumanMessage(answer)]
@@ -57,5 +64,9 @@ export async function chatInputNode(state: any) {
 
 			resolve({ messages: newMessages });
 		});
+	}
+
+	return new Promise<{ messages: any[] }>((resolve) => {
+		promptUser();
 	});
 }
