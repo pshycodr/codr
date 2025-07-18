@@ -1,31 +1,35 @@
-import { z } from "zod";
-import { StructuredOutputParser } from "langchain/output_parsers";
+import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
+import { codeTools } from "@core/agents/codeAgent/CodeTools";
+import { fileTools } from "@core/agents/fileAgent/fileTools";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import chalk from "chalk";
-import { fileTools } from "@core/agents/fileAgent/fileTools";
-import { codeTools } from "@core/agents/codeAgent/CodeTools";
-import { tools } from "../tools";
-import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
 import { llm } from "@llm/llm";
+import chalk from "chalk";
+import { StructuredOutputParser } from "langchain/output_parsers";
+import { z } from "zod";
+import { tools } from "../tools";
 
 // Collect and assert non-empty tool list
 const allTools = [
-  ...fileTools.map(t => t.name),
-  ...codeTools.map(t => t.name),
+	...fileTools.map((t) => t.name),
+	...codeTools.map((t) => t.name),
 ] as [string, ...string[]];
 
-
 const planSchema = z.array(
-  z.object({
-    step: z.string(),
-    tools: z.enum(allTools),
-    instructions: z.string().describe("Clear instruction in string of what to do")
-  })
+	z.object({
+		step: z.string(),
+		tools: z.enum(allTools),
+		instructions: z
+			.string()
+			.describe("Clear instruction in string of what to do"),
+	}),
 );
 
 const parser = StructuredOutputParser.fromZodSchema(planSchema);
-const instructions = parser.getFormatInstructions().replace(/}/g, "}}").replace(/{/g, "{{");
+const instructions = parser
+	.getFormatInstructions()
+	.replace(/}/g, "}}")
+	.replace(/{/g, "{{");
 
 // Prompt template
 const prompt = PromptTemplate.fromTemplate(`
@@ -47,10 +51,10 @@ Do not install unnecessary packages or frameworks unless required or explicitly 
 Your job is to take a high-level goal from the user and break it down into clear, concrete development steps.
 
 🧰 File Agent Tools:
-${fileTools.map(ft => `- ${ft.name}: ${ft.description}`).join("\n")}
+${fileTools.map((ft) => `- ${ft.name}: ${ft.description}`).join("\n")}
 
 🧠 Code Agent Tools:
-${codeTools.map(ct => `- ${ct.name}: ${ct.description}`).join("\n")}
+${codeTools.map((ct) => `- ${ct.name}: ${ct.description}`).join("\n")}
 
 Each step should:
 - Be actionable (CLI or code agent can do it)
@@ -71,65 +75,67 @@ ${instructions}
 `);
 
 export default async function goalPlanner({ goal }: { goal: string }) {
+	startLoader(`Planning for: ${goal}`);
 
-  startLoader(`Planning for: ${goal}`)
+	const chain = prompt.pipe(llm).pipe(parser);
 
-
-  const chain = prompt.pipe(llm).pipe(parser);
-
-  try {
-    const result = await chain.invoke({ goal });
-    stopLoader(`✓ Planning complete`)
-    return JSON.stringify(result);
-  } catch (err) {
-    console.error("❌ Failed to generate plan:", err);
-    return null;
-  }
+	try {
+		const result = await chain.invoke({ goal });
+		stopLoader(`✓ Planning complete`);
+		return JSON.stringify(result);
+	} catch (err) {
+		console.error("❌ Failed to generate plan:", err);
+		return null;
+	}
 }
 
-
 type PlanStep = {
-    step: string;
-    action: "runCommand" | "writeFile" | "createFile" | "installPackage" | "generateComponent";
-    args: Record<string, any>;
+	step: string;
+	action:
+		| "runCommand"
+		| "writeFile"
+		| "createFile"
+		| "installPackage"
+		| "generateComponent";
+	args: Record<string, any>;
 };
 
 function summarizePlanSteps(plan: PlanStep[]): string {
-    const lines: string[] = [];
+	const lines: string[] = [];
 
-    for (const [i, step] of plan.entries()) {
-        const { action, args } = step;
-        const num = i + 1;
+	for (const [i, step] of plan.entries()) {
+		const { action, args } = step;
+		const num = i + 1;
 
-        let desc = `${num}. ${step.step}`;
+		let desc = `${num}. ${step.step}`;
 
-        switch (action) {
-            case "runCommand":
-                desc += `\n   ↳ Run: \`${args.command}\``;
-                break;
+		switch (action) {
+			case "runCommand":
+				desc += `\n   ↳ Run: \`${args.command}\``;
+				break;
 
-            case "installPackage":
-                desc += `\n   ↳ Install: \`${args.packages.join(" ")}\``;
-                break;
+			case "installPackage":
+				desc += `\n   ↳ Install: \`${args.packages.join(" ")}\``;
+				break;
 
-            case "writeFile":
-                desc += `\n   ↳ Write file: \`${args.path}\``;
-                break;
+			case "writeFile":
+				desc += `\n   ↳ Write file: \`${args.path}\``;
+				break;
 
-            case "createFile":
-                desc += `\n   ↳ Create file: \`${args.path}\``;
-                break;
+			case "createFile":
+				desc += `\n   ↳ Create file: \`${args.path}\``;
+				break;
 
-            case "generateComponent":
-                desc += `\n   ↳ Generate component: \`${args.name || "Unnamed"}\``;
-                break;
+			case "generateComponent":
+				desc += `\n   ↳ Generate component: \`${args.name || "Unnamed"}\``;
+				break;
 
-            default:
-                desc += `\n   ↳ (Unknown action)`;
-        }
+			default:
+				desc += `\n   ↳ (Unknown action)`;
+		}
 
-        lines.push(desc);
-    }
+		lines.push(desc);
+	}
 
-    return lines.join("\n");
+	return lines.join("\n");
 }

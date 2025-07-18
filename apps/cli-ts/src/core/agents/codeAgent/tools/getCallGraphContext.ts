@@ -1,52 +1,59 @@
-import fs from 'fs';
-import path from 'path';
-import chalk from 'chalk';
-import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
+import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
+import chalk from "chalk";
+import fs from "fs";
+import path from "path";
 
 interface CallGraphNode {
-  functionName: string;
-  filePath: string;
-  calls: string[];
-  calledBy: string[];
+	functionName: string;
+	filePath: string;
+	calls: string[];
+	calledBy: string[];
 }
 
 interface CallGraphContext {
-  node: CallGraphNode;
-  callers: CallGraphNode[];
-  callees: CallGraphNode[];
+	node: CallGraphNode;
+	callers: CallGraphNode[];
+	callees: CallGraphNode[];
 }
 
-export function getCallGraphContext({fnName}:{fnName: string}): CallGraphContext | null {
+export function getCallGraphContext({
+	fnName,
+}: {
+	fnName: string;
+}): CallGraphContext | null {
+	startLoader(`Searching for Call-Graph of: ${fnName}`);
 
-  startLoader(`Searching for Call-Graph of: ${fnName}`)
+	const callgraphPath = path.resolve("./.codr/metadata/callgraph.json");
 
-  const callgraphPath = path.resolve('./.codr/metadata/callgraph.json');
+	if (!fs.existsSync(callgraphPath)) {
+		stopLoader(chalk.red("❌ callgraph.json not found in .metadata."));
+		return null;
+	}
 
-  if (!fs.existsSync(callgraphPath)) {
-    stopLoader(chalk.red("❌ callgraph.json not found in .metadata."));
-    return null;
-  }
+	const raw = fs.readFileSync(callgraphPath, "utf-8");
+	const parsed: CallGraphNode[] = JSON.parse(raw);
 
-  const raw = fs.readFileSync(callgraphPath, 'utf-8');
-  const parsed: CallGraphNode[] = JSON.parse(raw);
+	const targetNode = parsed.find((n) => n.functionName === fnName);
 
-  const targetNode = parsed.find(n => n.functionName === fnName);
+	if (!targetNode) {
+		stopLoader(`⚠️ Function '${fnName}' not found in call graph.`);
+		return null;
+	}
 
-  if (!targetNode) {
-    stopLoader(`⚠️ Function '${fnName}' not found in call graph.`);
-    return null;
-  }
+	const callees = parsed.filter((n) =>
+		targetNode.calls.includes(`${n.filePath}::${n.functionName}`),
+	);
+	const callers = parsed.filter((n) =>
+		targetNode.calledBy.includes(`${n.filePath}::${n.functionName}`),
+	);
 
-  const callees = parsed.filter(n => targetNode.calls.includes(`${n.filePath}::${n.functionName}`));
-  const callers = parsed.filter(n => targetNode.calledBy.includes(`${n.filePath}::${n.functionName}`));
+	stopLoader("✓ Call-Graph Found");
 
-  stopLoader("✓ Call-Graph Found")
-
-  return {
-    node: targetNode,
-    callers,
-    callees,
-  };
+	return {
+		node: targetNode,
+		callers,
+		callees,
+	};
 }
 
 // Example usage:

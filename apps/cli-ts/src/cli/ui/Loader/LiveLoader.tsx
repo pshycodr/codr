@@ -1,45 +1,45 @@
-// LiveLoader.tsx
-import React, { useEffect, useState } from 'react';
-import { Box, Newline, Text } from 'ink';
+import { Box, Newline, Text } from "ink";
+import type React from "react";
+import { useEffect, useState } from "react";
 
 interface LiveLoaderProps {
-  text: string;
-  done?: boolean;
-  doneText?: string;
-  frames?: string[];
-  interval?: number;
+	text: string;
+	done?: boolean;
+	doneText?: string;
+	frames?: string[];
+	interval?: number;
 }
 
-const defaultFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+const defaultFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
 const LiveLoader: React.FC<LiveLoaderProps> = ({
-  text,
-  done = false,
-  doneText = '✅ Done',
-  frames = defaultFrames,
-  interval = 80,
+	text,
+	done = false,
+	doneText = "✅ Done",
+	frames = defaultFrames,
+	interval = 80,
 }) => {
-  const [frameIndex, setFrameIndex] = useState(0);
+	const [frameIndex, setFrameIndex] = useState(0);
 
-  useEffect(() => {
-    if (done) return;
+	useEffect(() => {
+		if (done) return;
 
-    const timer = setInterval(() => {
-      setFrameIndex((i) => (i + 1) % frames.length);
-    }, interval);
+		const timer = setInterval(() => {
+			setFrameIndex((i) => (i + 1) % frames.length);
+		}, interval);
 
-    return () => clearInterval(timer);
-  }, [done, interval]);
+		return () => clearInterval(timer);
+	}, [done, interval]);
 
-  return (
-    <Box>
-      <Newline />
-      <Text color={done ? 'green' : 'cyan'}>
-        {done ? doneText : `${frames[frameIndex]} ${text}`}
-      </Text>
-      <Newline />
-    </Box>
-  );
+	return (
+		<Box>
+			<Newline />
+			<Text color={done ? "green" : "cyan"}>
+				{done ? doneText : `${frames[frameIndex]} ${text}`}
+			</Text>
+			<Newline />
+		</Box>
+	);
 };
 
 export default LiveLoader;

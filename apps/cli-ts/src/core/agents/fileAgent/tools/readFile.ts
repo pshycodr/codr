@@ -1,11 +1,10 @@
-import chalk from "chalk";
-import fs from "fs/promises";
-import * as fsSync from "fs";
-import path from "path";
-import mammoth from "mammoth";
-import pdfParse from "pdf-parse";
-import { resolvePath } from "@utils/resolvePath";
 import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
+import { resolvePath } from "@utils/resolvePath";
+import * as fsSync from "fs";
+import fs from "fs/promises";
+import mammoth from "mammoth";
+import path from "path";
+import pdfParse from "pdf-parse";
 
 const readFile = async ({ fileName }: { fileName: string }) => {
 	const fullPath = resolvePath(fileName);

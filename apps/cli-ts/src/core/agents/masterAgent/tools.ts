@@ -1,11 +1,11 @@
 import { tool } from "@langchain/core/tools";
-import { z } from "zod";
-import runCommand from "./tools/runCliCommand";
 import { llm } from "@llm/llm";
+import { z } from "zod";
+import { codeTools } from "../codeAgent/CodeTools";
+import { fileTools } from "../fileAgent/fileTools";
 import { confirmAction } from "./tools/confirmAction";
 import goalPlanner from "./tools/goalPlanner";
-import { fileTools } from "../fileAgent/fileTools";
-import { codeTools } from "../codeAgent/CodeTools";
+import runCommand from "./tools/runCliCommand";
 import { webSearch } from "./tools/webSearch";
 
 const cliCommand = tool(runCommand, {

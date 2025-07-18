@@ -1,89 +1,84 @@
-import chalk from 'chalk';
-
-import { randomUUID } from 'crypto';
-
-import zmq from 'zeromq';
-import formatContext from '../utils/formatContext';
-import { getCompletionFromOpenRouter } from '../utils/AI/ragAnswerAI';
-import { getSummarizeChat } from '../utils/AI/chatSummarizer';
-import { ensureRagServerRunning } from '@utils/ensureRagServer';
+import { ensureRagServerRunning } from "@utils/ensureRagServer";
+import chalk from "chalk";
+import { randomUUID } from "crypto";
+import zmq from "zeromq";
+import { getSummarizeChat } from "../utils/AI/chatSummarizer";
+import { getCompletionFromOpenRouter } from "../utils/AI/ragAnswerAI";
+import formatContext from "../utils/formatContext";
 
 interface CallRAG {
-    path?: string;
-    query?: string;
-    type?: string;
-    session_id?: string;
+	path?: string;
+	query?: string;
+	type?: string;
+	session_id?: string;
 }
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const callRAG = async (data: CallRAG) => {
+	const socket = new zmq.Request();
 
-    const socket = new zmq.Request();
+	try {
+		await socket.connect("tcp://127.0.0.1:5500");
 
-    try {
-        await socket.connect("tcp://127.0.0.1:5500");
+		await delay(100);
+		// data.type = 'check_collection'
+		const start = Date.now();
+		await socket.send(JSON.stringify(data));
 
-        await delay(100);
-        // data.type = 'check_collection'
-        const start = Date.now();
-        await socket.send(JSON.stringify(data));
+		const [result] = await socket.receive();
 
-        const [result] = await socket.receive();
+		if (!result) {
+			throw new Error("No response received from ZeroMQ server.");
+		}
 
+		const response = JSON.parse(result.toString());
 
-        if (!result) {
-            throw new Error("No response received from ZeroMQ server.");
-        }
-
-        const response = JSON.parse(result.toString());
-
-        return { success: true, response };
-    } catch (error) {
-        return { success: false, error };
-    } finally {
-        await delay(50);
-        await socket.close();
-    }
+		return { success: true, response };
+	} catch (error) {
+		return { success: false, error };
+	} finally {
+		await delay(50);
+		await socket.close();
+	}
 };
 
 export default callRAG;
 
 export class RagClient {
-    private endpoint: string;
+	private endpoint: string;
 
-    constructor(endpoint = 'tcp://127.0.0.1:5500') {
-        this.endpoint = endpoint;
-    }
+	constructor(endpoint = "tcp://127.0.0.1:5500") {
+		this.endpoint = endpoint;
+	}
 
-    private async delay(ms: number) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
-    }
+	private async delay(ms: number) {
+		return new Promise((resolve) => setTimeout(resolve, ms));
+	}
 
-    async callRagOnce(payload: any) {
-       
-        const socket = new zmq.Request();
+	async callRagOnce(payload: any) {
+		const socket = new zmq.Request();
 
-        try {
-            await socket.connect(this.endpoint);
-            await this.delay(100); // Small delay to ensure socket is ready
+		try {
+			await socket.connect(this.endpoint);
+			await this.delay(100); // Small delay to ensure socket is ready
 
-            await socket.send(JSON.stringify(payload));
+			await socket.send(JSON.stringify(payload));
 
-            const [result] = await socket.receive();
-            if (!result) {
-                throw new Error("No response received from ZeroMQ server.");
-            }
+			const [result] = await socket.receive();
+			if (!result) {
+				throw new Error("No response received from ZeroMQ server.");
+			}
 
-            const response = JSON.parse(result.toString());
-            return { success: true, response };
-        } catch (error) {
-            return { success: false, error };
-        } finally {
-            await this.delay(50); // Ensure response is fully handled
-            await socket.close();
-        }
-    }
+			const response = JSON.parse(result.toString());
+			return { success: true, response };
+		} catch (error) {
+			return { success: false, error };
+		} finally {
+			await this.delay(50); // Ensure response is fully handled
+			await socket.close();
+		}
+	}
 }
 
 // void (async () => {

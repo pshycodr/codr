@@ -1,44 +1,47 @@
-import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
-import chalk from 'chalk';
-import fs from 'fs';
-import path from 'path';
+import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
+import chalk from "chalk";
+import fs from "fs";
+import path from "path";
 
 interface EditInstruction {
-  content: string;
-  filePath: string;
-  startLine: number;
+	content: string;
+	filePath: string;
+	startLine: number;
 }
 
 /**
  * Inserts or replaces code at the specified startLine in a file.
  * @param instruction content to insert, filePath, and startLine
  */
-export function editFileAtLine({ content, filePath, startLine }: EditInstruction): boolean {
+export function editFileAtLine({
+	content,
+	filePath,
+	startLine,
+}: EditInstruction): boolean {
+	startLoader(`Inserting content at line ${startLine} in ${filePath} `);
 
-  startLoader(`Inserting content at line ${startLine} in ${filePath} `)
+	if (!fs.existsSync(filePath)) {
+		stopLoader(`❌ File not found: ${filePath}`);
+		return false;
+	}
 
-  if (!fs.existsSync(filePath)) {
-    stopLoader(`❌ File not found: ${filePath}`);
-    return false;
-  }
+	try {
+		const fileContent = fs.readFileSync(filePath, "utf-8");
+		const lines = fileContent.split("\n");
 
-  try {
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-    const lines = fileContent.split('\n');
+		const updatedLines = [
+			...lines.slice(0, startLine - 1),
+			content,
+			...lines.slice(startLine - 1),
+		];
 
-    const updatedLines = [
-      ...lines.slice(0, startLine - 1),
-      content,
-      ...lines.slice(startLine - 1)
-    ];
-
-    fs.writeFileSync(filePath, updatedLines.join('\n'), 'utf-8');
-    stopLoader(`✅ Inserted content at line ${startLine} in ${filePath}`);
-    return true;
-  } catch (error) {
-    stopLoader('❌ Failed to edit file.');
-    return false;
-  }
+		fs.writeFileSync(filePath, updatedLines.join("\n"), "utf-8");
+		stopLoader(`✅ Inserted content at line ${startLine} in ${filePath}`);
+		return true;
+	} catch (error) {
+		stopLoader("❌ Failed to edit file.");
+		return false;
+	}
 }
 
 // Usage:
@@ -47,5 +50,3 @@ export function editFileAtLine({ content, filePath, startLine }: EditInstruction
 //   filePath: "./src/index.ts",
 //   startLine: 10
 // });
-
-

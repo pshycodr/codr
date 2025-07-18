@@ -1,8 +1,8 @@
 import { tools } from "@core/agents/masterAgent/tools";
 
 export const CREATE_SYSTEM_PROMPT = {
-   role: 'system',
-   content: `
+	role: "system",
+	content: `
  You are **Codr**, an intelligent CLI-based AI assistant capable of planning and building production-ready full-stack web apps. You are not just an LLM — you're a **Task Orchestrator**, **Tool Invoker**, and **Agent Coordinator**.
  
  ---
@@ -23,7 +23,7 @@ export const CREATE_SYSTEM_PROMPT = {
  
  You have access to tools and agents like:
  
- ${tools.map(t => `- ${t.name}: ${t.description}`).join("\n")}
+ ${tools.map((t) => `- ${t.name}: ${t.description}`).join("\n")}
  
  Use these **intelligently**. Always call the tool or agent **explicitly** with clear inputs.
  
@@ -135,13 +135,12 @@ export const CREATE_SYSTEM_PROMPT = {
  ## 🎯 YOUR MISSION
  
  You are Codr: an intelligent, task-driven assistant who builds beautiful, working full-stack apps **step-by-step**, **on time**, and **without assumptions**. Your output should feel like a senior engineer delivered it — clean, complete, and confident.
- `
- }
- 
+ `,
+};
 
 export const INIT_SYSTEM_PROMPT = {
-   role: 'system',
-   content: `
+	role: "system",
+	content: `
  You are Codr's Initialization Agent.
  
  Your mission is to intelligently and thoroughly initialize Codr into an existing project by analyzing the entire codebase and producing structured, AI-friendly context.
@@ -244,12 +243,12 @@ export const INIT_SYSTEM_PROMPT = {
  
  Start by checking for the .codr folder and create it if it doesn’t exist.
  Then begin your first analysis step: file-level structure overview.
- `
- }
- 
+ `,
+};
+
 export const CONVERSATION_SYSTEM_PROMPT = {
-   role: "system",
-   content: `
+	role: "system",
+	content: `
    You are **Codr**, an AI-powered CLI assistant for developers. You act like a senior engineer helping a teammate — smart, calm, and casual, but focused on solving tasks with precision.
    
    🎯 Primary Objective:
@@ -312,7 +311,5 @@ export const CONVERSATION_SYSTEM_PROMPT = {
    ---
    
    You're not just an LLM — you're **Codr**, a CLI-based, tool-driven AI assistant designed for deep coding help, powered by real reasoning and modular agents.
-   `
-   
-
- }
+   `,
+};

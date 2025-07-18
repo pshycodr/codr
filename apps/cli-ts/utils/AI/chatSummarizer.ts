@@ -1,35 +1,37 @@
 import chalk from "chalk";
 
 type ChatMessage = {
-    user_query: string | undefined;
-    assistant_answer: string | undefined
-}
+	user_query: string | undefined;
+	assistant_answer: string | undefined;
+};
 
 interface CompletionInput {
-    chat: ChatMessage;
-    prevSummary?: string;
-    model?: string;
+	chat: ChatMessage;
+	prevSummary?: string;
+	model?: string;
 }
 
 export async function getSummarizeChat({
-    chat,
-    prevSummary,
-    model = "deepseek/deepseek-r1-0528:free", // Default model
+	chat,
+	prevSummary,
+	model = "deepseek/deepseek-r1-0528:free", // Default model
 }: CompletionInput): Promise<{ success: boolean; decision?: string }> {
-    try {
-        const completionResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-                "Content-Type": "application/json",
-                "X-Title": "openrouter-chat",
-            },
-            body: JSON.stringify({
-                model,
-                messages: [
-                    {
-                        role: "system",
-                        content: `
+	try {
+		const completionResponse = await fetch(
+			"https://openrouter.ai/api/v1/chat/completions",
+			{
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+					"Content-Type": "application/json",
+					"X-Title": "openrouter-chat",
+				},
+				body: JSON.stringify({
+					model,
+					messages: [
+						{
+							role: "system",
+							content: `
                         You are a precise, context-aware assistant. Your job is to generate a complete and accurate **summary** of the entire conversation, using only the information from the given context.
                         
                         Guidelines:
@@ -52,29 +54,28 @@ export async function getSummarizeChat({
                         
                         ---
                         New Summary (Previous Summary + Current chat):
-                        `
+                        `.trim(),
+						},
+					],
+				}),
+			},
+		);
 
-                            .trim(),
-                    },
-                ],
-            }),
-        });
+		const result: any = await completionResponse.json();
 
-        const result: any = await completionResponse.json();
+		if (!completionResponse.ok) {
+			throw new Error(`❌ API Error: ${JSON.stringify(result)}`);
+		}
 
-        if (!completionResponse.ok) {
-            throw new Error(`❌ API Error: ${JSON.stringify(result)}`);
-        }
+		const decision = result.choices?.[0]?.message?.content?.trim();
 
-        const decision = result.choices?.[0]?.message?.content?.trim();
+		if (!decision) {
+			return { success: false };
+		}
 
-        if (!decision) {
-            return { success: false };
-        }
-
-        return { success: true, decision };
-    } catch (err: any) {
-        console.error(chalk.red("❌ Error in OpenRouter request:"), err.message);
-        return { success: false };
-    }
+		return { success: true, decision };
+	} catch (err: any) {
+		console.error(chalk.red("❌ Error in OpenRouter request:"), err.message);
+		return { success: false };
+	}
 }
