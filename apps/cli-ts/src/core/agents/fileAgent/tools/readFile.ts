@@ -18,7 +18,7 @@ const readFile = async ({ fileName }: { fileName: string }) => {
 			const result = await mammoth.extractRawText({ path: fullPath });
 			content = result.value;
 		} else if (ext === ".pdf") {
-			const dataBuffer = fsSync.readFileSync(fullPath); // must use sync for buffer
+			const dataBuffer = fsSync.readFileSync(fullPath);
 
 			const { default: pdfParse } = await import("pdf-parse");
 
