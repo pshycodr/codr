@@ -4,7 +4,6 @@ import * as fsSync from "fs";
 import fs from "fs/promises";
 import mammoth from "mammoth";
 import path from "path";
-import pdfParse from "pdf-parse";
 
 const readFile = async ({ fileName }: { fileName: string }) => {
 	const fullPath = resolvePath(fileName);
@@ -20,6 +19,10 @@ const readFile = async ({ fileName }: { fileName: string }) => {
 			content = result.value;
 		} else if (ext === ".pdf") {
 			const dataBuffer = fsSync.readFileSync(fullPath); // must use sync for buffer
+
+			// 👇 Lazy import avoids running test logic
+			const { default: pdfParse } = await import("pdf-parse");
+
 			const data = await pdfParse(dataBuffer);
 			content = data.text;
 		} else if (ext === ".md" || ext === ".txt") {
