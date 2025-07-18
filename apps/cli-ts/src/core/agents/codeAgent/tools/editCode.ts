@@ -1,3 +1,4 @@
+import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
 import chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';
@@ -12,15 +13,12 @@ interface EditInstruction {
  * Inserts or replaces code at the specified startLine in a file.
  * @param instruction content to insert, filePath, and startLine
  */
-export function editFileAtLine(instruction: EditInstruction): boolean {
+export function editFileAtLine({ content, filePath, startLine }: EditInstruction): boolean {
 
-  console.log(chalk.bgYellow.black("codeAgent/editFileAtLine Called"), instruction)
-
-
-  const { content, filePath, startLine } = instruction;
+  startLoader(`Inserting content at line ${startLine} in ${filePath} `)
 
   if (!fs.existsSync(filePath)) {
-    console.error(`❌ File not found: ${filePath}`);
+    stopLoader(`❌ File not found: ${filePath}`);
     return false;
   }
 
@@ -35,13 +33,13 @@ export function editFileAtLine(instruction: EditInstruction): boolean {
     ];
 
     fs.writeFileSync(filePath, updatedLines.join('\n'), 'utf-8');
-    console.log(`✅ Inserted content at line ${startLine} in ${filePath}`);
+    stopLoader(`✅ Inserted content at line ${startLine} in ${filePath}`);
     return true;
   } catch (error) {
-    console.error('❌ Failed to edit file:', error);
+    stopLoader('❌ Failed to edit file.');
     return false;
   }
-} 
+}
 
 // Usage:
 // editFileAtLine({

@@ -17,7 +17,7 @@ export const chatWithContext = async (data: CallRAG) => {
 
     const { session_id, query } = await chatManager.startSession(data)
 
-    console.log(chalk.bgCyanBright.black("Initial Response: "),session_id, query, data.type);
+    // console.log(chalk.bgCyanBright.black("Initial Response: "),session_id, query, data.type);
 
     if (!query) throw new Error("Query is required to start chat");
 

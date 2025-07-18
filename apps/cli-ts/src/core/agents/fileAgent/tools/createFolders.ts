@@ -11,7 +11,7 @@ const createFolder = async ({ path }: { path: string }) => {
     stopLoader('✓ Folder Created Successfully');
     return { success: true };
   } catch (error) {
-    console.error(`❌ Failed to create folder "${path}":`, error);
+    stopLoader(`❌ Failed to create folder "${path}"`);
     return { success: false, error };
   }
 };

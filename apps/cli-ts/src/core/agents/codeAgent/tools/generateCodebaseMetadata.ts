@@ -9,6 +9,7 @@ import { generateHtmlMetadata } from "@core/context/codebaseMetaData/htmlMetadat
 import chalk from "chalk";
 import fs from "fs";
 import path from "path";
+import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
 
 type CodeEntity = {
   entity_name: string;
@@ -25,13 +26,14 @@ interface QueryData {
   query: "none";
   parsedCodebase?: CodeEntity[];
   type: "codebase";
-}
+};
 
 const metadataPath = path.resolve("./.codr/metadata");
 const rag = new RagClient();
 const dirname = process.cwd();
 
 const generateCodebaseMetadata = async () => {
+  startLoader(`Generating Codebase Metadata`)
   try {
     const { success, response } = await rag.callRagOnce({
       type: "check_collection",
@@ -46,18 +48,19 @@ const generateCodebaseMetadata = async () => {
     generateCssMetadata()
 
     // if (fs.existsSync(metadataPath) && response.exists) {
-    //   console.log(".metadata folder exists ✅");
+    //   startLoader("Checking .metadata folder existence");
+    //   stopLoader(".metadata folder exists ✅");
     //   return "project .metadata folder already exists in the root folder and in the vector db";
     // }
 
     if (!response.exists) {
       // Parse codebase
-      console.log(chalk.cyan("🔍 Parsing and summarizing codebase..., path: "), dirname);
+      startLoader(chalk.cyan("🔍 Parsing and summarizing codebase..., path: ") + dirname);
       const parsed = await parseCodebase(dirname);
-      console.log(chalk.cyanBright("📄 Parsed:"), parsed?.length, "items");
+      stopLoader(chalk.cyanBright("📄 Parsed: ") + parsed?.length + " items");
 
       // Send to RAG
-      console.log(chalk.yellowBright("📡 Sending to RAG..."));
+      startLoader(chalk.yellowBright("📡 Sending to RAG..."));
       const data: QueryData = {
         path: dirname,
         parsedCodebase: parsed,
@@ -68,15 +71,16 @@ const generateCodebaseMetadata = async () => {
       const { success: ragSuccess, response: context } = await callRAG(data);
 
       if (!ragSuccess) {
-        console.log(chalk.redBright("❌ Failed to retrieve context from RAG."));
+        stopLoader("❌ Failed to retrieve context from RAG.");
         return { success: false };
       }
 
     }
+    stopLoader("project .metadata folder and vector embeddings created successfully")
 
     return "project .metadata folder and vector embeddings created successfully";
   } catch (error: any) {
-    console.log(chalk.redBright("❌ Failed to generate metadata: "), error);
+   stopLoader("❌ Failed to generate metadata");
   }
 };
 

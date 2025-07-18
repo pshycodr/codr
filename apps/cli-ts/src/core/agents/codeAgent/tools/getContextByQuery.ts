@@ -1,6 +1,7 @@
 import { RagClient } from "@transport/zeromqClient";
 import { formatContextForLLM } from "@utils/formatContext";
 import chalk from "chalk";
+import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
 
 interface RagQueryInput {
   path: string;
@@ -18,7 +19,7 @@ interface CodeContextResult {
 const rag = new RagClient();
 
 export async function getCodeContextByQuery({query}:{query: string}){
-  console.log(chalk.bgYellow.black("codeAgent/getCodeContextByQuery Called"), query)
+  startLoader(chalk.bgYellow.black("codeAgent/getCodeContextByQuery Called: ") + query);
 
   const cwd = process.cwd();
   const payload: RagQueryInput = {
@@ -29,18 +30,17 @@ export async function getCodeContextByQuery({query}:{query: string}){
 
   try {
     const { success, response, error } = await rag.callRagOnce(payload);
-    // console.log(response);
     
     const formattedContext = formatContextForLLM(response.results, 'codebase');
 
     if (!success) {
-      console.log(chalk.red("❌ RAG query failed."), error);
+      stopLoader(chalk.red("❌ RAG query failed: ") + error);
       return `this is the ERROR : ${error}, \n And this is parameter you passes while calling the tool: ${query}. this tool only accepts Query in a pure string format not in any other format`;
     }
-
+    stopLoader(`Code context retrieval completed for query: "${query}"`);
     return formattedContext|| [];
   } catch (err) {
-    console.log(chalk.red("❌ Error during RAG query:"), err);
+    stopLoader(chalk.red("❌ Error during RAG query: ") + err);
     return null;
   }
 }

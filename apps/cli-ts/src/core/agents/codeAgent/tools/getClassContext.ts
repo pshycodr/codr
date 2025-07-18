@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
+import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
 
 interface ClassMeta {
   name: string;
@@ -33,12 +34,12 @@ interface ClassContext {
 }
 
 export function getClassContext({className}:{className: string}): ClassContext | null {
-  console.log(chalk.bgYellow.black("codeAgent/getClassContext Called"), className)
+  startLoader(`Getting class context for ${className}`);
 
   const classesMetaPath = path.resolve('./.codr/metadata/classes.json');
 
   if (!fs.existsSync(classesMetaPath)) {
-    console.log(chalk.red("❌ classes.json not found in .metadata."));
+    stopLoader(chalk.red("❌ classes.json not found in .metadata."));
     return null;
   }
 
@@ -48,18 +49,19 @@ export function getClassContext({className}:{className: string}): ClassContext |
   const clsMeta = parsed.find(cls => cls.name === className);
 
   if (!clsMeta) {
-    console.log(chalk.yellow(`⚠️ Class '${className}' not found in metadata.`));
+    stopLoader(chalk.yellow(`⚠️ Class '${className}' not found in metadata.`));
     return null;
   }
 
   if (!fs.existsSync(clsMeta.filePath)) {
-    console.log(chalk.red(`❌ Source file not found: ${clsMeta.filePath}`));
+    stopLoader(chalk.red(`❌ Source file not found: ${clsMeta.filePath}`));
     return null;
   }
 
   const fileLines = fs.readFileSync(clsMeta.filePath, 'utf-8').split('\n');
   const code = fileLines.slice(clsMeta.startLine - 1, clsMeta.endLine).join('\n');
 
+  stopLoader(`Class context retrieval for ${className} completed.`);
   return {
     metadata: clsMeta,
     code,

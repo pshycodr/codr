@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
+import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
 
 interface FileMeta {
   filePath: string;
@@ -21,13 +22,12 @@ interface FileContext {
 
 export function getFileContext({filePath}:{filePath: string}): FileContext | null {
 
-  console.log(chalk.bgYellow.black("codeAgent/getFileContext Called"), filePath)
-
+  startLoader(`Getting file context for: ${filePath}`);
 
   const filesMetaPath = path.resolve('./.codr/metadata/files.json');
 
   if (!fs.existsSync(filesMetaPath)) {
-    console.log(chalk.red("❌ files.json not found in .metadata."));
+    stopLoader(chalk.red("❌ files.json not found in .metadata."));
     return null;
   }
 
@@ -37,17 +37,18 @@ export function getFileContext({filePath}:{filePath: string}): FileContext | nul
   const fileMeta = parsed.find(file => path.resolve(file.filePath) === path.resolve(filePath));
 
   if (!fileMeta) {
-    console.log(chalk.yellow(`⚠️ File '${filePath}' not found in metadata.`));
+    stopLoader(chalk.yellow(`⚠️ File '${filePath}' not found in metadata.`));
     return null;
   }
 
   if (!fs.existsSync(fileMeta.filePath)) {
-    console.log(chalk.red(`❌ Source file not found: ${fileMeta.filePath}`));
+    stopLoader(chalk.red(`❌ Source file not found: ${fileMeta.filePath}`));
     return null;
   }
 
   const code = fs.readFileSync(fileMeta.filePath, 'utf-8');
 
+  stopLoader(`File context retrieval completed for: ${filePath}`);
   return {
     metadata: fileMeta,
     code,

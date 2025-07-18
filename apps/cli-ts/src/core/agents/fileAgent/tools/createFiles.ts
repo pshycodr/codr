@@ -25,7 +25,7 @@ const createFiles = async ({ folder, files }: CreateFilesInput) => {
 
     return { success: true, };
   } catch (error: any) {
-    console.error(`❌ Error in createFiles: ${(error as Error).message}`);
+    stopLoader(`❌ Error in createFiles: ${(error as Error).message}`);
     // throw err;
     return { success: false, error }
   }

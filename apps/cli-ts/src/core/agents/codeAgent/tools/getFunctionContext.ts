@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
+import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
 
 interface FunctionMeta {
   name: string;
@@ -32,13 +33,12 @@ interface FunctionContext {
 
 export function getFunctionContext({fnName}:{fnName: string}): FunctionContext | null {
 
-  console.log(chalk.bgYellow.black("codeAgent/getFunctionContext Called"), fnName)
-
+  startLoader(chalk.bgYellow.black("codeAgent/getFunctionContext Called: ") + fnName);
 
   const functionsMetaPath = path.resolve('./.codr/metadata/functions.json');
 
   if (!fs.existsSync(functionsMetaPath)) {
-    console.log(chalk.red("❌ functions.json not found in .metadata."));
+    stopLoader(chalk.red("❌ functions.json not found in .metadata."));
     return null;
   }
 
@@ -48,18 +48,19 @@ export function getFunctionContext({fnName}:{fnName: string}): FunctionContext |
   const fnMeta = parsed.find(f => f.name === fnName);
 
   if (!fnMeta) {
-    console.log(chalk.yellow(`⚠️ Function '${fnName}' not found in metadata.`));
+    stopLoader(chalk.yellow(`⚠️ Function '${fnName}' not found in metadata.`));
     return null;
   }
 
   if (!fs.existsSync(fnMeta.filePath)) {
-    console.log(chalk.red(`❌ Source file not found: ${fnMeta.filePath}`));
+    stopLoader(chalk.red(`❌ Source file not found: ${fnMeta.filePath}`));
     return null;
   }
 
   const fileLines = fs.readFileSync(fnMeta.filePath, 'utf-8').split('\n');
   const code = fileLines.slice(fnMeta.startLine - 1, fnMeta.endLine).join('\n');
 
+  stopLoader(`Function context retrieval completed for: ${fnName}`);
   return {
     metadata: fnMeta,
     code,
@@ -69,4 +70,4 @@ export function getFunctionContext({fnName}:{fnName: string}): FunctionContext |
 
 // Example usage:
 // const result = getFunctionContext("parseCodebase");
-// console.log(result);
+// startLoader("Displaying function context result"); stopLoader(`Function context retrieval completed for parseCodebase: ${result ? 'Success' : 'Failed'}`);

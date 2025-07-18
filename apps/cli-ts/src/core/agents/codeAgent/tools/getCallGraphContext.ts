@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
+import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
 
 interface CallGraphNode {
   functionName: string;
@@ -17,13 +18,12 @@ interface CallGraphContext {
 
 export function getCallGraphContext({fnName}:{fnName: string}): CallGraphContext | null {
 
-  console.log(chalk.bgYellow.black("codeAgent/getCallGraphContext Called"), fnName)
-
+  startLoader(`Searching for Call-Graph of: ${fnName}`)
 
   const callgraphPath = path.resolve('./.codr/metadata/callgraph.json');
 
   if (!fs.existsSync(callgraphPath)) {
-    console.log(chalk.red("❌ callgraph.json not found in .metadata."));
+    stopLoader(chalk.red("❌ callgraph.json not found in .metadata."));
     return null;
   }
 
@@ -33,12 +33,14 @@ export function getCallGraphContext({fnName}:{fnName: string}): CallGraphContext
   const targetNode = parsed.find(n => n.functionName === fnName);
 
   if (!targetNode) {
-    console.log(chalk.yellow(`⚠️ Function '${fnName}' not found in call graph.`));
+    stopLoader(`⚠️ Function '${fnName}' not found in call graph.`);
     return null;
   }
 
   const callees = parsed.filter(n => targetNode.calls.includes(`${n.filePath}::${n.functionName}`));
   const callers = parsed.filter(n => targetNode.calledBy.includes(`${n.filePath}::${n.functionName}`));
+
+  stopLoader("✓ Call-Graph Found")
 
   return {
     node: targetNode,
