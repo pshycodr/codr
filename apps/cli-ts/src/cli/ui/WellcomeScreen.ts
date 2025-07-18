@@ -1,8 +1,6 @@
 import chalk from "chalk";
 
 export function printWelcomeScreen() {
-	console.clear();
-
 	const banner = `
       .-.                                   .-.      
      / \\_\\                                 /_/ \\     
