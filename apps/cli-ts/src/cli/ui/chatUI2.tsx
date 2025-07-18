@@ -2,7 +2,7 @@ import type { ChatSessionManager } from "@transport/chatSessionManager";
 import chalk from "chalk";
 import { Box, render, Text } from "ink";
 import TextInput from "ink-text-input";
-import React, { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import MessageBubble from "./src/components/MessageBubble";
 import ScrollableBox from "./src/components/ScrollableBox";
 

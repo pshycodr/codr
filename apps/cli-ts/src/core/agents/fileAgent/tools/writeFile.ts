@@ -1,5 +1,4 @@
 import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
-import chalk from "chalk";
 import fs from "fs";
 
 const writeFile = async ({

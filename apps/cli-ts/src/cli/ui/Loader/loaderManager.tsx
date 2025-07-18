@@ -1,5 +1,4 @@
 import { type Instance, render } from "ink";
-import React from "react";
 import LiveLoader from "./LiveLoader";
 
 let loaderInstance: Instance | null = null;

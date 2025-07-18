@@ -106,7 +106,7 @@ program
 			});
 		} else {
 			const { queryWebsite } = await import(
-				"@core/tools/documents/queryWebsite"
+				"@core/tools/documents/queryAnswer"
 			);
 			await queryWebsite({ path: opts.path, query: opts.query, type: "doc" });
 		}
@@ -134,7 +134,7 @@ program
 			});
 		} else {
 			const { queryWebsite } = await import(
-				"@core/tools/documents/queryWebsite"
+				"@core/tools/documents/queryAnswer"
 			);
 			await queryWebsite({
 				path: opts.path,

@@ -1,6 +1,6 @@
 import fs, { statSync } from "fs";
 import path from "path";
-import { Project, type SourceFile, SyntaxKind } from "ts-morph";
+import { Project, type SourceFile } from "ts-morph";
 
 export interface FileMeta {
 	filePath: string;
@@ -17,7 +17,7 @@ export interface FileMeta {
 const project = new Project({
 	compilerOptions: {
 		allowJs: true,
-		jsx: 2, // React
+		jsx: 2,
 		target: 2,
 		module: 1,
 		checkJs: false,

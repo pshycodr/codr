@@ -5,7 +5,6 @@ import {
 	Project,
 	type PropertyDeclaration,
 	type SourceFile,
-	SyntaxKind,
 } from "ts-morph";
 
 interface ClassMeta {

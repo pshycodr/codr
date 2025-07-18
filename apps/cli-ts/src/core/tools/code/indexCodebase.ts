@@ -1,6 +1,5 @@
 import { parseCodebase } from "@codebase";
 import callRAG, { RagClient } from "@transport/zeromqClient";
-import { summarizeFunctionsWithDescriptions } from "@utils/AI/functionSummarize";
 import { getCompletionFromOpenRouter } from "@utils/AI/ragAnswerAI";
 import { formatContextForLLM } from "@utils/formatContext";
 import chalk from "chalk";

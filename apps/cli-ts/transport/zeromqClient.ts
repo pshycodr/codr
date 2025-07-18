@@ -1,10 +1,4 @@
-import { ensureRagServerRunning } from "@utils/ensureRagServer";
-import chalk from "chalk";
-import { randomUUID } from "crypto";
 import zmq from "zeromq";
-import { getSummarizeChat } from "../utils/AI/chatSummarizer";
-import { getCompletionFromOpenRouter } from "../utils/AI/ragAnswerAI";
-import formatContext from "../utils/formatContext";
 
 interface CallRAG {
 	path?: string;

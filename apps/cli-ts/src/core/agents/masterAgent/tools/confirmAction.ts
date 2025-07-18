@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import inquirer from "inquirer";
-import { z } from "zod";
 
 /**
  * Confirmation tool — lets user review & approve or modify the agent's plan.

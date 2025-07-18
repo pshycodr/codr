@@ -2,12 +2,9 @@ import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
 import { codeTools } from "@core/agents/codeAgent/CodeTools";
 import { fileTools } from "@core/agents/fileAgent/fileTools";
 import { PromptTemplate } from "@langchain/core/prompts";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { llm } from "@llm/llm";
-import chalk from "chalk";
 import { StructuredOutputParser } from "langchain/output_parsers";
 import { z } from "zod";
-import { tools } from "../tools";
 
 // Collect and assert non-empty tool list
 const allTools = [

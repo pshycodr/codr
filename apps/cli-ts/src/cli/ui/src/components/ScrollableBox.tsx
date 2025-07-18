@@ -1,6 +1,5 @@
-import { Box, Newline, render, Spacer, Text, useApp, useInput } from "ink";
-import TextInput from "ink-text-input";
-import React, { useEffect, useRef, useState } from "react";
+import { Box, useApp, useInput } from "ink";
+import React, { useRef, useState } from "react";
 
 const ScrollableBox = React.forwardRef<
 	{ scrollDown: () => void },

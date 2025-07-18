@@ -1,7 +1,6 @@
 import chalk from "chalk";
 import { spawn } from "child_process";
 import inquirer from "inquirer";
-import os from "os";
 import readline from "readline";
 
 type RunCommandResult =

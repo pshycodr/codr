@@ -2,7 +2,7 @@ import chalk from "chalk";
 import { randomUUID } from "crypto";
 import { getSummarizeChat } from "../utils/AI/chatSummarizer";
 import { getCompletionFromOpenRouter } from "../utils/AI/ragAnswerAI";
-import formatContext, { formatContextForLLM } from "../utils/formatContext";
+import { formatContextForLLM } from "../utils/formatContext";
 import type { RagClient } from "./zeromqClient";
 
 export class ChatSessionManager {

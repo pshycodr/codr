@@ -1,9 +1,4 @@
-import {
-	FunctionDeclaration,
-	type Node,
-	SyntaxKind,
-	VariableStatement,
-} from "ts-morph";
+import { type Node, SyntaxKind } from "ts-morph";
 import type { CodeEntity } from "../shared/types/codeEntity.types";
 import { getCodeFromLines } from "../utils/helper";
 

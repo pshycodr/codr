@@ -2,16 +2,11 @@ import fs from "fs";
 import path from "path";
 import {
 	type ArrowFunction,
-	CallExpression,
 	type FunctionDeclaration,
-	Identifier,
-	ImportDeclaration,
 	Node,
 	Project,
 	type SourceFile,
 	SyntaxKind,
-	VariableDeclaration,
-	VariableStatement,
 } from "ts-morph";
 
 interface FunctionMeta {

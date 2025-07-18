@@ -1,7 +1,5 @@
 import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
-import chalk from "chalk";
 import fs from "fs";
-import path from "path";
 
 export function deleteCodeAtLines({
 	filePath,

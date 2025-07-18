@@ -1,5 +1,4 @@
 import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
-import chalk from "chalk";
 import { mkdir } from "fs/promises";
 
 const createFolder = async ({ path }: { path: string }) => {

@@ -8,7 +8,6 @@ import generateFunctionMetadata from "@core/context/codebaseMetaData/functionMet
 import { generateHtmlMetadata } from "@core/context/codebaseMetaData/htmlMetadata";
 import callRAG, { RagClient } from "@transport/zeromqClient";
 import chalk from "chalk";
-import fs from "fs";
 import path from "path";
 
 type CodeEntity = {

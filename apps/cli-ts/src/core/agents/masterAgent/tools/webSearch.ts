@@ -1,10 +1,7 @@
 import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { llm } from "@llm/llm";
 import { RagClient } from "@transport/zeromqClient";
 import { ensureRagServerRunning } from "@utils/ensureRagServer";
-import { formatContextForLLM } from "@utils/formatContext";
-import chalk from "chalk";
 import { config } from "dotenv";
 import path from "path";
 

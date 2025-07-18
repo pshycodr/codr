@@ -1,4 +1,3 @@
-// utils/printHelpScreen.ts
 import chalk from "chalk";
 
 export function printHelpScreen() {
