@@ -1,33 +1,53 @@
 import chalk from 'chalk';
 import fs from 'fs/promises';
-import { resolvePath } from "@utils/resolvePath"
+import * as fsSync from 'fs'; // Needed for sync read of binary buffers
+import path from 'path';
+import mammoth from 'mammoth';
+import pdfParse from 'pdf-parse';
+import { resolvePath } from "@utils/resolvePath";
 import { startLoader, stopLoader } from '@cli/ui/Loader/loaderManager';
 
-
 const readFile = async ({ fileName }: { fileName: string }) => {
-    startLoader(`Reading file: ${fileName}`)
+  const fullPath = resolvePath(fileName);
+  const ext = path.extname(fullPath).toLowerCase();
 
-    // Resolve relative path based on current working directory
-    const fullPath = resolvePath(fileName)
-    console.log("🔍 Resolved Path:", fullPath);
+  startLoader(`Reading file: ${fileName}`);
 
-    try {
-        const res = await fs.readFile(fullPath, "utf-8");
+  try {
+    let content = '';
 
-        if (!res.trim()) {
-            console.log(chalk.yellow.black("⚠️ The file is empty."));
-        }
-        stopLoader(`✓ File read successfully`)
-        return { success: true, content: res };
-    } catch (error: any) {
-        if (error.code === "ENOENT") {
-            console.log(chalk.red.black(`❌ File not found: ${fileName}`));
-        } else {
-            console.log(chalk.red.black(`💥 Error reading file: ${error.message}`));
-        }
-
-        return { success: false, error: error.message };
+    if (ext === '.docx') {
+      const result = await mammoth.extractRawText({ path: fullPath });
+      content = result.value;
+    } else if (ext === '.pdf') {
+      const dataBuffer = fsSync.readFileSync(fullPath); // must use sync for buffer
+      const data = await pdfParse(dataBuffer);
+      content = data.text;
+    } else if (ext === '.md' || ext === '.txt') {
+      content = await fs.readFile(fullPath, 'utf8');
+    } else {
+      stopLoader(`⚠️ Unsupported file type: ${ext}`);
+      return {
+        success: false,
+        error: `Unsupported file type: ${ext}. Supported types are .docx, .pdf, .md, and .txt.`,
+      };
     }
+
+    if (!content.trim()) {
+      stopLoader(`⚠️ The file is empty`);
+      return { success: true, content, warning: 'File is empty' };
+    }
+
+    stopLoader(`✓ File read successfully`);
+    return { success: true, content };
+
+  } catch (error: any) {
+    stopLoader(`❌ Failed to read: ${fileName}`);
+    return {
+      success: false,
+      error: `Failed to read file. ${error.message}`,
+    };
+  }
 };
 
 export default readFile;
