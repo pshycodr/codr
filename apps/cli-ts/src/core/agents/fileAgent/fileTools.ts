@@ -3,14 +3,13 @@ import { z } from "zod";
 import { llm } from "@llm/llm";
 
 // File operation handlers
-import createFolder from "./tools/files/createFolders";
-import createFiles from "./tools/files/createFiles";
-import readFile from "./tools/files/readFile";
-import writeFile from "./tools/files/writeFile";
-import findFile from "./tools/files/findFile";
+import createFolder from "./tools/createFolders";
+import createFiles from "./tools/createFiles";
+import readFile from "./tools/readFile";
+import writeFile from "./tools/writeFile";
+import findFile from "./tools/findFile";
 
 // CLI and tool routing
-import runCommand from "./tools/runCommand";
 
 /**
  * Tool: Create a new folder at a specified path.
@@ -20,17 +19,6 @@ const makeFolder = tool(createFolder, {
   description: "Creates a new folder at the given path",
   schema: z.object({
     path: z.string(),
-  }),
-});
-
-/**
- * Tool: Run any shell or CLI command.
- */
-const cliCommand = tool(runCommand, {
-  name: "run_cli-command",
-  description: "Executes any command in the CLI (e.g., install packages, run scripts)",
-  schema: z.object({
-    command: z.string(),
   }),
 });
 
@@ -84,7 +72,6 @@ const searchFile = tool(findFile, {
 // Export all tools as an array for LangGraph or planner consumption
 export const fileTools = [
   makeFolder,
-  cliCommand,
   makeFiles,
   readFiles,
   writeFiles,

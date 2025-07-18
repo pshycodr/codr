@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatOpenAI } from "@langchain/openai";
 import { ChatAnthropic } from "@langchain/anthropic";
-import { ChatDeepSeek } from "@langchain/deepseek"; // Assuming DeepSeek is imported like this
+import { ChatDeepSeek } from "@langchain/deepseek"; 
 
 // Resolve __dirname in ES Module
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
