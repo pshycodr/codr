@@ -18,3 +18,4 @@ tqdm
 unstructured
 pyzmq
 plotly
+unstructured[md]
