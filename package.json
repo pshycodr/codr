@@ -7,8 +7,7 @@
 	"scripts": {
 		"dev": "bun run ./apps/cli-ts/src/index.ts",
 		"build": "bun build ./apps/cli-ts/src/index.ts --outdir dist --target bun",
-		"prepare": "husky",
-		"format": "biome check . --apply"
+		"prepare": "husky install"
 	},
 	"bin": {
 		"codr": "./dist/index.js"
@@ -28,7 +27,8 @@
 		"@types/bun": "latest",
 		"@types/cheerio": "^1.0.0",
 		"@types/node": "^24.0.1",
-		"chalk": "^5.4.1"
+		"chalk": "^5.4.1",
+		"husky": "^8.0.0"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
@@ -53,7 +53,6 @@
 		"dotenv": "^16.5.0",
 		"figlet": "^1.8.2",
 		"gradient-string": "^3.0.0",
-		"husky": "^9.1.7",
 		"i": "^0.3.7",
 		"ink": "^6.0.1",
 		"ink-text-input": "^6.0.0",
