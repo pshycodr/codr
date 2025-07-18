@@ -34,39 +34,39 @@ export async function chatInputNode(state: any) {
 		}
 	}
 
-	// Dynamic prompt line
-	const promptLine =
-		state.messages?.length > 2
-			? `${promptSymbol} Continue? ${exitNotice}\n${promptSymbol} `
-			: `${promptSymbol} Your request ${exitNotice}\n${promptSymbol} `;
-
-	function promptUser() {
-		rl.question(promptLine, (answer) => {
-			if (answer.trim() === "") {
-				console.log(emptyInputMessage);
-				promptUser(); // Prompt again
-				return;
-			}
-
-			if (answer.toLowerCase() === "exit") {
-				console.log(chalk.dim("\nSession ended\n"));
-				rl.close();
-				process.exit(0);
-			}
-
-			// Echo user input cleanly
-			console.log(`${userPrefix} ${answer}`);
-			rl.close();
-
-			const newMessages = state.messages
-				? [...state.messages, new HumanMessage(answer)]
-				: [new HumanMessage(answer)];
-
-			resolve({ messages: newMessages });
-		});
-	}
-
 	return new Promise<{ messages: any[] }>((resolve) => {
-		promptUser();
+		// Dynamic prompt line
+		const promptLine =
+			state.messages?.length > 2
+				? `${promptSymbol} Continue? ${exitNotice}\n${promptSymbol} `
+				: `${promptSymbol} Your request ${exitNotice}\n${promptSymbol} `;
+
+		const ask = () => {
+			rl.question(promptLine, (answer) => {
+				if (answer.trim() === "") {
+					console.log(emptyInputMessage);
+					ask(); // Ask again
+					return;
+				}
+
+				if (answer.toLowerCase() === "exit") {
+					console.log(chalk.dim("\nSession ended\n"));
+					rl.close();
+					process.exit(0);
+				}
+
+				// Echo user input cleanly
+				console.log(`${userPrefix} ${answer}`);
+				rl.close();
+
+				const newMessages = state.messages
+					? [...state.messages, new HumanMessage(answer)]
+					: [new HumanMessage(answer)];
+
+				resolve({ messages: newMessages });
+			});
+		};
+
+		ask();
 	});
 }
