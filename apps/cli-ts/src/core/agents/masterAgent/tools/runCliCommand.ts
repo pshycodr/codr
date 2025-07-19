@@ -1,13 +1,14 @@
 import chalk from "chalk";
 import { spawn } from "child_process";
 import inquirer from "inquirer";
-import readline from "readline";
 
+// Type returned from runCliCommand
 type RunCommandResult =
 	| { success: true; stdout: string; output: string }
 	| { success: false; error: string; output?: string }
 	| { success: false; userComment: string };
 
+// Dangerous command patterns
 const DANGEROUS_COMMAND_PATTERNS = [
 	/\brm\s+-rf\b/,
 	/\bsudo\b/,
@@ -20,10 +21,10 @@ const DANGEROUS_COMMAND_PATTERNS = [
 	/\binit\b/,
 ];
 
-const isDangerous = (command: string): boolean => {
-	return DANGEROUS_COMMAND_PATTERNS.some((pattern) => pattern.test(command));
-};
+const isDangerous = (command: string): boolean =>
+	DANGEROUS_COMMAND_PATTERNS.some((pattern) => pattern.test(command));
 
+// Simple shell detector
 function detectShell(): string {
 	const shell = process.env.SHELL || process.env.ComSpec || "";
 	if (/powershell/i.test(shell)) return "PowerShell";
@@ -32,6 +33,14 @@ function detectShell(): string {
 	return "Unknown Shell";
 }
 
+// Detect interactive command
+function isInteractiveCommand(command: string): boolean {
+	return ["shadcn", "create-", "init", "login", "auth", "add", "new"].some(
+		(keyword) => command.includes(keyword),
+	);
+}
+
+// Main runner
 const runCliCommand = async ({
 	command,
 }: {
@@ -41,7 +50,7 @@ const runCliCommand = async ({
 	console.log(chalk.cyan("🔹 Command Received:"), chalk.yellow(command));
 
 	const shell = detectShell();
-	console.log(chalk.magentaBright(`Detected Shell:`), chalk.white(shell));
+	console.log(chalk.magentaBright("Detected Shell:"), chalk.white(shell));
 
 	if (isDangerous(command)) {
 		console.log(
@@ -83,63 +92,82 @@ const runCliCommand = async ({
 		return { success: false, userComment };
 	}
 
+	const interactive = isInteractiveCommand(command);
+
 	return new Promise((resolve) => {
-		const rl = readline.createInterface({
-			input: process.stdin,
-			output: process.stdout,
-		});
+		if (interactive) {
+			// 🔄 Full terminal control for interactive commands
+			const child = spawn(command, {
+				shell: true,
+				stdio: "inherit",
+			});
 
-		let output = "";
+			child.on("exit", (code) => {
+				if (code === 0) {
+					resolve({
+						success: true,
+						stdout: `✅ Interactive command "${command}" completed successfully.`,
+						output: `interactive command executed`,
+					});
+				} else {
+					resolve({
+						success: false,
+						error: `❌ Interactive command exited with code ${code}`,
+					});
+				}
+			});
 
-		const child = spawn(command, {
-			shell: true,
-			stdio: ["pipe", "pipe", "pipe"],
-		});
-
-		// Capture stdout
-		child.stdout?.on("data", (data) => {
-			const dataStr = data.toString();
-			process.stdout.write(dataStr);
-			output += dataStr;
-		});
-
-		// Capture stderr
-		child.stderr?.on("data", (data) => {
-			const dataStr = data.toString();
-			process.stderr.write(dataStr);
-			output += dataStr;
-		});
-
-		// Handle user input
-		rl.on("line", (input) => {
-			child.stdin?.write(input + "\n");
-		});
-
-		child.on("exit", (code) => {
-			rl.close();
-			if (code === 0) {
-				resolve({
-					success: true,
-					stdout: `Command "${command}" completed successfully.`,
-					output: output.trim(), // Return the captured output
-				});
-			} else {
+			child.on("error", (err) => {
 				resolve({
 					success: false,
-					error: `Command exited with code ${code}`,
-					output: output.trim(), // Return the captured output even on error
+					error: `❌ Interactive command failed: ${err.message}`,
 				});
-			}
-		});
-
-		child.on("error", (err) => {
-			rl.close();
-			resolve({
-				success: false,
-				error: err.message,
-				output: output.trim(), // Return any partial output if available
 			});
-		});
+		} else {
+			// 🧾 Output-capturing mode for non-interactive commands
+			const child = spawn(command, {
+				shell: true,
+				stdio: ["pipe", "pipe", "pipe"],
+			});
+
+			let output = "";
+
+			child.stdout?.on("data", (data) => {
+				const str = data.toString();
+				process.stdout.write(str);
+				output += str;
+			});
+
+			child.stderr?.on("data", (data) => {
+				const str = data.toString();
+				process.stderr.write(str);
+				output += str;
+			});
+
+			child.on("exit", (code) => {
+				if (code === 0) {
+					resolve({
+						success: true,
+						stdout: `✅ Command "${command}" completed successfully.`,
+						output: output.trim(),
+					});
+				} else {
+					resolve({
+						success: false,
+						error: `❌ Command exited with code ${code}`,
+						output: output.trim(),
+					});
+				}
+			});
+
+			child.on("error", (err) => {
+				resolve({
+					success: false,
+					error: `❌ Failed to execute command: ${err.message}`,
+					output: output.trim(),
+				});
+			});
+		}
 	});
 };
 
