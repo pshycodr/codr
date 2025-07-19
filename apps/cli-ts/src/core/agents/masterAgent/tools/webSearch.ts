@@ -2,18 +2,14 @@ import { startLoader, stopLoader } from "@cli/ui/Loader/loaderManager";
 import { llm } from "@llm/llm";
 import { RagClient } from "@transport/zeromqClient";
 import { ensureRagServerRunning } from "@utils/ensureRagServer";
-import { config } from "dotenv";
-import path from "path";
-
-const envPath = path.resolve(__dirname, "../../.env");
-config({ path: envPath });
 
 export async function webSearch({ query }: { query: string }) {
 	startLoader(`Searching the web for: ${query}`);
 
 	const res = await fetch(
-		`https://customsearch.googleapis.com/customsearch/v1?cx=${process.env.GOOGLE_CSE_ID}&key=${process.env.GOOGLE_CSE_API_KEY}&num=2&q=${query}`,
+		`https://google-search-api.aroy262692.workers.dev/search?q=${encodeURIComponent(query)}&num=2`,
 	);
+
 	const data = await res.json();
 
 	const urls: any = [];
